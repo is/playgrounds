@@ -8,10 +8,12 @@ public class __0_Client {
 		EventLoop loop = new EventLoop();
 		TCPClient c = new TCPClient("localhost", 1985, loop);
 		try {
-			Object result = c.call("add", new Object[] {new Integer(100), new Integer(300)});
+			int result = ((Number)c.call("add", new Object[] {new Integer(10), new Integer(30)})).intValue();
 			System.out.println("result:" + result);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		c.close();
+		loop.shutdown();
 	}
 }
