@@ -1,13 +1,31 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>isdemos</artifactId>
-    <groupId>us.yuxin</groupId>
-    <version>0.0.1-SNAPSHOT</version>
-  </parent>
-  <groupId>us.yuxin</groupId>
-  <artifactId>msgpack-servlet</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>Message Pack Servlet</name>
-  <description>Message Pack Servlet handler</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>isdemos</artifactId>
+		<groupId>us.yuxin</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<groupId>us.yuxin</groupId>
+	<artifactId>msgpack-servlet</artifactId>
+	<name>Message Pack Servlet</name>
+	<description>Message Pack Servlet handler</description>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>6.0.29</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.msgpack</groupId>
+			<artifactId>msgpack</artifactId>
+			<version>0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.msgpack</groupId>
+			<artifactId>msgpack-rpc</artifactId>
+			<version>0.4.1</version>
+		</dependency>
+	</dependencies>
 </project>
