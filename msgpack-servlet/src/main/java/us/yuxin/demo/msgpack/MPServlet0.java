@@ -47,8 +47,8 @@ public class MPServlet0 extends HttpServlet {
 		}
 		sis.close();
 		unpacker.bufferConsumed(contentLength);
+		unpacker.execute();
 		AbstractList<?> request = (AbstractList<?>)unpacker.getData();
-		
 		ArrayList<Object> response = new ArrayList<Object>();
 		
 		response.add("MPServilet0");
