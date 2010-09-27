@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd"
+	metadata-complete="false" version="2.5">
+
+	<display-name>MessagePack bridge services</display-name>
+	<description>Test web application for MessagePack</description>
+
+	<servlet>
+		<servlet-name>mpservlet0</servlet-name>
+		<servlet-class>us.yuxin.demo.msgpack.MPServlet0</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>hello</servlet-name>
+		<servlet-class>us.yuxin.demo.msgpack.HelloServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>mpservlet0</servlet-name>
+		<url-pattern>/0</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>hello</servlet-name>
+		<url-pattern>/h</url-pattern>
+	</servlet-mapping>
+</web-app>
