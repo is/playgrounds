@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>isdemos</artifactId>
-		<groupId>us.yuxin</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<groupId>us.yuxin.demo</groupId>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
-	<groupId>us.yuxin</groupId>
+	<groupId>us.yuxin.demo</groupId>
 	<artifactId>msgpack-servlet</artifactId>
 	<name>Message Pack Servlet</name>
 	<description>Message Pack Servlet handler</description>
