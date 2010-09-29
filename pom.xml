@@ -7,6 +7,7 @@
   <name>Is Demos</name>
   <description>is demo projects.</description>
   <modules>
-  	<module>msgpack-servlet</module>
+    <module>msgpack-servlet</module>
+    <module>hornetq</module>
   </modules>
 </project>
