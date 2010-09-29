@@ -9,5 +9,6 @@
   <modules>
     <module>msgpack-servlet</module>
     <module>hornetq</module>
+    <module>groovy0</module>
   </modules>
 </project>
