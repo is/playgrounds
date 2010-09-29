@@ -1,0 +1,34 @@
+<configuration xmlns="urn:hornetq"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:hornetq /schema/hornetq-configuration.xsd">
+
+	<connectors>
+		<connector name="netty">
+			<factory-class>org.hornetq.core.remoting.impl.netty.NettyConnectorFactory
+			</factory-class>
+			<param key="host" value="${hornetq.remoting.netty.host:localhost}" />
+			<param key="port" value="${hornetq.remoting.netty.port:5445}" />
+		</connector>
+	</connectors>
+
+	<acceptors>
+		<acceptor name="netty">
+			<factory-class>org.hornetq.core.remoting.impl.netty.NettyAcceptorFactory
+			</factory-class>
+			<param key="host" value="${hornetq.remoting.netty.host:localhost}" />
+			<param key="port" value="${hornetq.remoting.netty.port:5445}" />
+		</acceptor>
+	</acceptors>
+
+	<security-settings>
+		<security-setting match="#">
+			<permission type="createNonDurableQueue" roles="guest" />
+			<permission type="deleteNonDurableQueue" roles="guest" />
+			<permission type="consume" roles="guest" />
+			<permission type="send" roles="guest" />
+		</security-setting>
+	</security-settings>
+	
+	<security-enabled>false</security-enabled> 
+</configuration>
+               

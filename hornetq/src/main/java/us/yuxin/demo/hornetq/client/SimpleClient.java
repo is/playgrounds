@@ -19,7 +19,7 @@ public class SimpleClient {
 	public static void main(String[] args) throws Exception {
 		Connection connection = null;
 		try {
-			Queue queue = HornetQJMSClient.createQueue("exampleQueue");
+			Queue queue = HornetQJMSClient.createQueue("ExampleQueue");
 			Map<String, Object> connectionParams = new HashMap<String, Object>();
 			connectionParams
 					.put(
