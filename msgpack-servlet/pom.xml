@@ -12,7 +12,7 @@
 	<description>Message Pack Servlet handler</description>
 
 	<properties>
-		<jettyVersion>7.1.6.v20100715</jettyVersion>
+		<jettyVersion>8.0.0.M1</jettyVersion>
 	</properties>
 
 	<dependencies>
@@ -20,6 +20,7 @@
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>3.0.20100224</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<!-- 
@@ -31,14 +32,15 @@
 		-->
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-continuation</artifactId>
-			<version>${jettyVersion}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-server</artifactId>
 			<version>${jettyVersion}</version>
 			<scope>runtime</scope>
+			<exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
 		</dependency>
 
 		<dependency>
@@ -53,7 +55,7 @@
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>7.1.6.v20100715</version>
+				<version>8.0.0.M1</version>
 				<configuration>
 					<stopPort>9966</stopPort>
 					<stopKey>foo</stopKey>
