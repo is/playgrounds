@@ -5,9 +5,14 @@
 	<artifactId>deploy-mvn-resin-4</artifactId>
 	<packaging>war</packaging>
 	<name>Resin 4 Deploy</name>
-	<version>0.0.1-1</version>
+	<version>0.0.1-2</version>
 	<description>Resin 4 Deploy Demo</description>
 
+	<properties>
+		<resinVersion>4.0.9</resinVersion>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>javax</groupId>
@@ -16,4 +21,23 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.caucho</groupId>
+				<artifactId>resin-maven-plugin</artifactId>
+				<version>${resinVersion}</version>
+				<configuration>
+					<server>${remote.resin.server}</server>
+					<port>${remote.resin.port}</port>
+					<user>${remote.resin.user}</user>
+					<password>${remote.resin.password}</password>
+					<contextRoot>/hello-2</contextRoot>
+					<version>${project.version}</version>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

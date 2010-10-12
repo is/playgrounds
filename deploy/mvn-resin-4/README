@@ -1,1 +1,6 @@
 deploy to remote Resin 4 by Maven.
+
+Reference:
+http://wiki.caucho.com/Maven2
+http://blog.caucho.com/?p=134
+http://caucho.com/m2/
