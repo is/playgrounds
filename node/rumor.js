@@ -3,11 +3,13 @@ var events = require('events'),
     sys = require('sys'),
     url = require('url'),
 		urlparse = require('url').parse,
-		htmlparser = require('htmlparser'),
+//		htmlparser = require('htmlparser'),
 		BufferList = require('bufferlist').BufferList;
 
 var cllog = console.log
 var clinfo = console.log
+var _reHref = /<a\s[^>]*href="([^"]+)"|<a\s[^>]*href='([^']+)'/img
+var _reHref2 = /href=["'](.*)["']$/i
 
 // ---- Configuration ----
 var C = {
@@ -287,6 +289,8 @@ function Planner(rumor) {
 		}
 
 		var self = this;
+
+		/*
 		var handler = new htmlparser.DefaultHandler();
 		var parser = new htmlparser.Parser(handler);
 		try {
@@ -296,9 +300,29 @@ function Planner(rumor) {
 		}
 		
 		linktags = htmlparser.DomUtils.getElementsByTagName('a', handler.dom);
+		*/
+
 		var entries = [];
 		var entriesMap = {};
 
+		var linktags = fetcher.content.toString().match(_reHref);
+		if (linktags) {
+			for (var i = 0; i < linktags.length; i++) {
+				var res = _reHref2.exec(linktags[i]);
+				if (!res)
+					continue;
+				var u = url.resolve(fetcher.entry.url, res[1]);
+				var e = new Entry(u, fetcher.entry.url);
+				if (e.protocol === 'http:') {
+					if (!entriesMap[u]) {
+						entries.push(e);
+						entriesMap[u] = 1;
+					}
+				}
+			}
+		}
+
+		/*
 		for (var i = 0; i < linktags.length; i++) {
 			var l = linktags[i];
 			if (!l.attribs || !l.attribs.href)
@@ -313,6 +337,7 @@ function Planner(rumor) {
 				}
 			}
 		}
+		*/
 
 		var added = entries.length
 		if (accu >= rumor.entriesLimit1 && added > 30) {
