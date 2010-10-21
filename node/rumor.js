@@ -12,7 +12,7 @@ var clinfo = console.log
 // ---- Configuration ----
 var C = {
 	"version": '0.0.1',
-	'content.sizelimit': 1024 * 1024 * 10,
+	'content.sizelimit': 1024 * 1024 * 4,
 };
 
 // ---- Entry ----
@@ -59,7 +59,7 @@ function Rumor(C) {
 
 	this.curFetcherId = 0;
 	this.curFetchers = 0;
-	this.curFetcherLimit = 2600;
+	this.curFetcherLimit = 6000;
 
 	// ----
 	this.genFetcherId = function() {
@@ -80,8 +80,9 @@ function Rumor(C) {
 			if (this.entries.length == 0)
 				return;
 
-			if (this.curFetchers >= this.curFetcherLimit)
+			if (this.curFetchers >= this.curFetcherLimit) {
 				return;
+			}
 
 			var ei = this.entries.shift();
 			delete this.entriesMap[ei.url];
@@ -114,7 +115,7 @@ function Rumor(C) {
 		if (sites[task.entry.host] != undefined)
 			sites[task.entry.host] += 1;
 		else {
-			cllog("[site] " + task.entry.host +  " <= " + task.entry.referer + " | " + this.curFetcherId + " | " + this.entries.length + " | " + this.curFetchers);
+			// cllog("[site] " + task.entry.host +  " <= " + task.entry.referer + " | " + this.curFetcherId + " | " + this.entries.length + " | " + this.curFetchers);
 			sites[task.entry.host] = 1;
 		}
 
@@ -256,7 +257,7 @@ function Planner(rumor) {
 			return;
 		}
 		
-		cllog("[" + fetcher.retCode + "] " + fetcher.entry.url);
+		// cllog("[" + fetcher.retCode + "] " + fetcher.entry.url);
 		return;
 	};
 
@@ -315,7 +316,7 @@ function Planner(rumor) {
 
 		var added = entries.length
 		if (accu >= rumor.entriesLimit1 && added > 30) {
-			added = 25;
+			added = 15;
 		}
 
 		var swapper = function(a, L, e) {
@@ -375,12 +376,23 @@ function main() {
 	var r = new Rumor(C);
 	r.planner = new Planner(r);
 	r.tagline();
-	var ei = new Entry('http://linuxtoy.org/archives/ubuntu_and_qt.html');
+	var ei = new Entry('http://github.com/');
 	r.fireFetcher(ei);
 }
 
 main();
 
+
 process.on('exit', function() {
 	console.log('--- END ---');
 });
+
+process.on('uncaughtException', function(err) {
+	console.log('--- EXCEPTION --- ' + err);
+});
+
+/*
+process.on('SIGINT', function() {
+	console.log('--- Got SIGINT. Press Control-D to exit.');
+});
+*/
