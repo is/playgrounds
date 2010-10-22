@@ -1,9 +1,10 @@
 var events = require('events'),
+    fs = require('fs'),
     http = require('http'),
     sys = require('sys'),
     url = require('url'),
 		urlparse = require('url').parse,
-//		htmlparser = require('htmlparser'),
+		log = require('log'),
 		BufferList = require('bufferlist').BufferList;
 
 var cllog = console.log
@@ -16,6 +17,10 @@ var C = {
 	"version": '0.0.1',
 	'content.sizelimit': 1024 * 1024 * 4,
 };
+
+var slog = new log(log.INFO, fs.createWriteStream('site.log'));
+var ulog = new log(log.INFO, fs.createWriteStream('url.log'));
+var clog = new log(log.INFO);
 
 // ---- Entry ----
 function Entry(url, referer) {
@@ -62,6 +67,17 @@ function Rumor(C) {
 	this.curFetcherId = 0;
 	this.curFetchers = 0;
 	this.curFetcherLimit = 6000;
+
+	this.curFinished = 0;
+	this.curFinishedContent = 0;
+
+	this.tenSecond = function(self) {
+		clog.info("C:" + self.curFetcherId + " S:" + self.curFetchers + " ES:" + self.entries.length + " FS:" + self.curFinished + " FB:" + self.curFinishedContent);
+		self.curFinished = 0;
+		self.curFinishedContent = 0;
+	}
+
+	this.tenSecondTimerId = setInterval(this.tenSecond, 10000, this);
 
 	// ----
 	this.genFetcherId = function() {
@@ -118,6 +134,7 @@ function Rumor(C) {
 			sites[task.entry.host] += 1;
 		else {
 			// cllog("[site] " + task.entry.host +  " <= " + task.entry.referer + " | " + this.curFetcherId + " | " + this.entries.length + " | " + this.curFetchers);
+			slog.info(task.entry.host + " == " + task.entry.referer);
 			sites[task.entry.host] = 1;
 		}
 
@@ -144,6 +161,9 @@ function Rumor(C) {
 	};
 
 	this.onFetcherFinished = function(fetcher) {
+		this.curFinished ++;
+		if (fetcher.content)
+			this.curFinishedContent += fetcher.content.length;
 		this.planner.onFetcherFinished(fetcher);
 	};
 
@@ -248,6 +268,9 @@ function Fetcher(R, ei) {
 function Planner(rumor) {
 	this.rumor = rumor;
 	this.onFetcherFinished = function(fetcher) {
+		if (!fetcher.entry.referer)
+			fetcher.entry.referer = "{empty}"
+
 		var retCode = fetcher.retCode;
 		if (retCode == 301 || retCode == 302 || retCode == 307) {
 			this.onRedirect(fetcher);
@@ -259,13 +282,12 @@ function Planner(rumor) {
 			return;
 		}
 		
-		// cllog("[" + fetcher.retCode + "] " + fetcher.entry.url);
+		ulog.info("[" + fetcher.retCode + "] " + fetcher.entry.url + " == " + fetcher.entry.referer);
 		return;
 	};
 
 	this.onContent = function(fetcher) {
 		if (!fetcher.content && !fetcher.content.length) {
-			// cllog("[200] " + fetcher.entry.url + " {empty}");
 			return;
 		}
 
@@ -283,24 +305,15 @@ function Planner(rumor) {
 		//		cllog(" vvv  " + fetcher.entry.referer);
 	
 		var accu = rumor.entries.length;
+		ulog.info("[200] " + fetcher.entry.url + " == " + fetcher.entry.referer + " {" + contentLength + ":"+ contentType + "} <" + fetcher.id + ">");
 		if (accu >= rumor.entriesLimit2) {
-			// cllog("[200] " + fetcher.entry.url + " === " + contentType + ":" + contentLength + " | " + rumor.curFetcherId + " | " + rumor.entries.length + " | " + rumor.curFetchers);
 			return;
 		}
+
+		if (contentType.search("text/html") == -1)
+			return;
 
 		var self = this;
-
-		/*
-		var handler = new htmlparser.DefaultHandler();
-		var parser = new htmlparser.Parser(handler);
-		try {
-			parser.parseComplete(fetcher.content);
-		} catch(e) {
-			return;
-		}
-		
-		linktags = htmlparser.DomUtils.getElementsByTagName('a', handler.dom);
-		*/
 
 		var entries = [];
 		var entriesMap = {};
@@ -323,6 +336,16 @@ function Planner(rumor) {
 		}
 
 		/*
+		var handler = new htmlparser.DefaultHandler();
+		var parser = new htmlparser.Parser(handler);
+		try {
+			parser.parseComplete(fetcher.content);
+		} catch(e) {
+			return;
+		}
+		
+		linktags = htmlparser.DomUtils.getElementsByTagName('a', handler.dom);
+	
 		for (var i = 0; i < linktags.length; i++) {
 			var l = linktags[i];
 			if (!l.attribs || !l.attribs.href)
@@ -359,7 +382,6 @@ function Planner(rumor) {
 				rumor.addEntry(entries[i]);
 		}
 
-		// cllog("[200] " + fetcher.entry.url + " === " + contentType + ":" + contentLength + " | " + added + " links | " + rumor.curFetcherId + " | " + rumor.entries.length + " | " + rumor.curFetchers);
 		rumor.fireFetchers();
 	};
 
@@ -370,7 +392,7 @@ function Planner(rumor) {
 
 		redirectURL = url.resolve(fetcher.entry.url, redirectURL);
 		// cllog("[" + fetcher.retCode + "] " + fetcher.entry.url + " -> " + redirectURL);
-		this.addEntry(redirectURL, fetcher.referer, true);
+		this.addEntry(redirectURL, fetcher.entry.referer, true);
 	};
 
 
@@ -387,17 +409,6 @@ function Planner(rumor) {
 
 // ---- Main ----
 function main() {
-/*
-	cl.setInfoPrefix(' = ');
-	cl.setLogPrefix(' . ');
-	cl.setErrorPrefix(' ! ');
-	cl.setWarnPrefix(' + ');
-
-	cl.setLogColor('BLUE');
-	cl.setInfoColor('MAGENTA');
-	cl.setErrorColor('RED');
-	cl.setWarnColor('RED');
-*/
 	var r = new Rumor(C);
 	r.planner = new Planner(r);
 	r.tagline();
