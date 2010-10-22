@@ -63,7 +63,7 @@ function Rumor(C) {
 	this.entriesLimit2 = 5000;
 
 	this.sites = new Object;
-	this.tasks = new Object;
+	this.fetchers = new Object;
 
 	this.curFetcherId = 0;
 	this.curFetchers = 0;
@@ -76,8 +76,24 @@ function Rumor(C) {
 
 	this.tick10S = function(self) {
 		self.tickCount += 1;
-		clog.info(sprintf("T:%d I:%d, CF:%d, EI:%d, FS:%d, FB:%.1fm", 
-			self.tickCount, self.curFetcherId, self.curFetchers, 
+		var slow = 0;
+		var timeout = 0;
+
+		for (var id in self.fetchers) {
+			var fetcher = self.fetchers[id];
+			if (self.tickCount - fetcher.beginTick < 3)
+				continue;
+			if (self.tickCount - fetcher.beginTick > 10) {
+				fetcher.co.destroy();
+				fetcher.clear();
+				timeout ++;
+			} else {
+				slow ++;
+			}
+		}
+
+		clog.info(sprintf("TICK:%d ID:%d - FETCHERS:%d SLOW-FETCHERS:%d TIMEOUT:%d - ENTRIES:%d - FINISHED:%d CONTENT:%.1fm", 
+			self.tickCount, self.curFetcherId, self.curFetchers, slow, timeout,
 			self.entries.length, self.curFinished, self.curFinishedContent / 1048576.0));
 
 		//clog.info("C:" + self.curFetcherId + " S:" + self.curFetchers + " ES:" + self.entries.length + " FS:" + self.curFinished + " FB:" + self.curFinishedContent);
@@ -135,7 +151,7 @@ function Rumor(C) {
 			return;
 
 		this.curFetchers ++;
-		this.tasks[task.id] = task;
+		this.fetchers[task.id] = task;
 
 		// Add to sites map
 		var sites = this.sites;
@@ -156,7 +172,7 @@ function Rumor(C) {
 			return;
 
 		this.curFetchers --;
-		delete this.tasks[task.id];
+		delete this.fetchers[task.id];
 
 		// Remove from sites
 		var sites = this.sites;
