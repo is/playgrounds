@@ -1,4 +1,5 @@
 var events = require('events'),
+    argv = require('optimist').argv,
     fs = require('fs'),
     http = require('http'),
     sys = require('sys'),
@@ -16,12 +17,36 @@ var _reHref2 = /href=["'](.*)["']$/i
 // ---- Configuration ----
 var C = {
 	"version": '0.0.1',
-	'content.sizelimit': 1024 * 1024 * 4,
+	"content.sizelimit": 1024 * 1024 * 4,
 };
 
-var slog = new log(log.INFO, fs.createWriteStream('sites.log'));
-var ulog = new log(log.INFO, fs.createWriteStream('urls.log'));
+if (argv.parallel)
+	argv.p = argv.parallel;
+if (argv.name)
+	argv.n = argv.name;
+if (argv.timeout)
+	argv.t = argv.timeout;
+
+var fetcherTimeot = 10;
+if (argv.t)
+	fetcherTimeout = argv.t;
+
+var slog, ulog;
+if (argv.n) {
+	slog = new log(log.INFO, fs.createWriteStream(argv.n + '-sites.log'));
+	ulog = new log(log.INFO, fs.createWriteStream(argv.n + '-urls.log'));
+} else {
+	slog = new log(log.INFO, fs.createWriteStream('sites.log'));
+	ulog = new log(log.INFO, fs.createWriteStream('urls.log'));
+}
+
 var clog = new log(log.INFO);
+
+function logerror(name, error) {
+	console.log(name);
+	console.log(error);
+	console.log(error.stack);
+}
 
 // ---- Entry ----
 function Entry(url, referer) {
@@ -69,6 +94,9 @@ function Rumor(C) {
 	this.curFetchers = 0;
 	this.curFetcherLimit = 250;
 
+	if (argv.p)
+		this.curFetcherLimit = argv.p;
+
 	this.curFinished = 0;
 	this.curFinishedContent = 0;
 
@@ -83,7 +111,7 @@ function Rumor(C) {
 			var fetcher = self.fetchers[id];
 			if (self.tickCount - fetcher.beginTick < 3)
 				continue;
-			if (self.tickCount - fetcher.beginTick > 10) {
+			if (self.tickCount - fetcher.beginTick > fetcherTimeout) {
 				fetcher.co.destroy();
 				fetcher.clear();
 				timeout ++;
@@ -92,7 +120,7 @@ function Rumor(C) {
 			}
 		}
 
-		clog.info(sprintf("TICK:%d ID:%d - FETCHERS:%d SLOW-FETCHERS:%d TIMEOUT:%d - ENTRIES:%d - FINISHED:%d CONTENT:%.1fm", 
+		clog.info(sprintf("TICK:%d ID:%d - FETCHERS:%d SLOW:%d TIMEOUT:%d - ENTRIES:%d - FINISHED:%d CONTENT:%.1fm", 
 			self.tickCount, self.curFetcherId, self.curFetchers, slow, timeout,
 			self.entries.length, self.curFinished, self.curFinishedContent / 1048576.0));
 
@@ -221,9 +249,21 @@ function Fetcher(R, ei) {
 		this.co = http.createClient(this.entry.port, this.entry.hostname);
 		this.co.setTimeout(30 * 1000);
 
-		this.co.on('error', function(exception) {
+		this.co.on('close', function(error) {
+			// if (error) {
+			//	console.log("SOCKET-CLOSE");
+			//	console.log(error);
+			//	console.log(error.stack);
+			//}
 			self.clear();
-			self.co.destroy();
+		});
+		this.co.on('error', function(error) {
+			//if (error) {
+			//	console.log("SOCKET-CLOSE");
+			//	console.log(error);
+			//	console.log(error.stack);
+			//}
+			self.clear();
 		});
 
 		var headers = {};
@@ -269,11 +309,13 @@ function Fetcher(R, ei) {
 	};
 
 	this.onRequestError = function(error) {
+		logerror('onRequestError', error);
 		this.clear();
 		this.co.destroy();
 	};
 
 	this.onResponseError = function(error) {
+		// logerror('onResponseError', error);
 		this.clear();
 		this.response.client.destroy();
 	};
@@ -453,7 +495,7 @@ process.on('exit', function() {
 
 process.on('uncaughtException', function(err) {
 	console.log('--- EXCEPTION --- ' + err);
-	console.log(err);
+	console.log(err.stack);
 });
 
 /*
