@@ -3,9 +3,10 @@ var events = require('events'),
     http = require('http'),
     sys = require('sys'),
     url = require('url'),
-		urlparse = require('url').parse,
-		log = require('log'),
-		BufferList = require('bufferlist').BufferList;
+    urlparse = require('url').parse,
+    log = require('log'),
+    sprintf = require('./sprintf-0.6').sprintf
+    BufferList = require('bufferlist').BufferList;
 
 var cllog = console.log
 var clinfo = console.log
@@ -18,8 +19,8 @@ var C = {
 	'content.sizelimit': 1024 * 1024 * 4,
 };
 
-var slog = new log(log.INFO, fs.createWriteStream('site.log'));
-var ulog = new log(log.INFO, fs.createWriteStream('url.log'));
+var slog = new log(log.INFO, fs.createWriteStream('sites.log'));
+var ulog = new log(log.INFO, fs.createWriteStream('urls.log'));
 var clog = new log(log.INFO);
 
 // ---- Entry ----
@@ -66,18 +67,26 @@ function Rumor(C) {
 
 	this.curFetcherId = 0;
 	this.curFetchers = 0;
-	this.curFetcherLimit = 6000;
+	this.curFetcherLimit = 250;
 
 	this.curFinished = 0;
 	this.curFinishedContent = 0;
 
-	this.tenSecond = function(self) {
-		clog.info("C:" + self.curFetcherId + " S:" + self.curFetchers + " ES:" + self.entries.length + " FS:" + self.curFinished + " FB:" + self.curFinishedContent);
+	this.tickCount = 0;
+
+	this.tick10S = function(self) {
+		self.tickCount += 1;
+		clog.info(sprintf("T:%d I:%d, CF:%d, EI:%d, FS:%d, FB:%.1fm", 
+			self.tickCount, self.curFetcherId, self.curFetchers, 
+			self.entries.length, self.curFinished, self.curFinishedContent / 1048576.0));
+
+		//clog.info("C:" + self.curFetcherId + " S:" + self.curFetchers + " ES:" + self.entries.length + " FS:" + self.curFinished + " FB:" + self.curFinishedContent);
 		self.curFinished = 0;
 		self.curFinishedContent = 0;
+		self.fireFetchers();
 	}
 
-	this.tenSecondTimerId = setInterval(this.tenSecond, 10000, this);
+	this.tick10STimerId = setInterval(this.tick10S, 10000, this);
 
 	// ----
 	this.genFetcherId = function() {
@@ -183,6 +192,7 @@ function Fetcher(R, ei) {
 	this.rumor = R;
 	this.entry = ei;
 	this.id = R.genFetcherId();
+	this.beginTick = this.rumor.tickCount;
 	this.registered = false;
 
 	if (this.entry.contentSizeLimit)
@@ -193,6 +203,8 @@ function Fetcher(R, ei) {
 	this.fire = function() {
 		var self = this;
 		this.co = http.createClient(this.entry.port, this.entry.hostname);
+		this.co.setTimeout(30 * 1000);
+
 		this.co.on('error', function(exception) {
 			self.clear();
 			self.co.destroy();
@@ -200,7 +212,7 @@ function Fetcher(R, ei) {
 
 		var headers = {};
 		headers.host = this.entry.host;
-		headers.agent = 'rumor-' + this.rumor.version();
+		headers.agent = 'rumor-' + this.rumor.version() + " http://github.com/is/Demos/blob/master/node/rumor.js";
 
 		if (this.entry.referer)
 			headers.referer = this.entry.referer;
@@ -305,7 +317,7 @@ function Planner(rumor) {
 		//		cllog(" vvv  " + fetcher.entry.referer);
 	
 		var accu = rumor.entries.length;
-		ulog.info("[200] " + fetcher.entry.url + " == " + fetcher.entry.referer + " {" + contentLength + ":"+ contentType + "} <" + fetcher.id + ">");
+		ulog.info("[200] " + fetcher.entry.url + " == " + fetcher.entry.referer + " {" + contentLength + ":"+ contentType + "} <" + fetcher.id + "/" + (this.rumor.tickCount - fetcher.beginTick) + ">");
 		if (accu >= rumor.entriesLimit2) {
 			return;
 		}
@@ -425,6 +437,7 @@ process.on('exit', function() {
 
 process.on('uncaughtException', function(err) {
 	console.log('--- EXCEPTION --- ' + err);
+	console.log(err);
 });
 
 /*
