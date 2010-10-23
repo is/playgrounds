@@ -94,6 +94,8 @@ function Rumor(C) {
 	this.curFetchers = 0;
 	this.curFetcherLimit = 250;
 
+	this.lastSeeds = [];
+
 	if (argv.p)
 		this.curFetcherLimit = argv.p;
 
@@ -111,7 +113,7 @@ function Rumor(C) {
 			var fetcher = self.fetchers[id];
 			if (self.tickCount - fetcher.beginTick < 3)
 				continue;
-			if (self.tickCount - fetcher.beginTick > fetcherTimeout) {
+			if (self.tickCount - fetcher.beginTick > fetcher.timeout) {
 				fetcher.co.destroy();
 				fetcher.clear();
 				timeout ++;
@@ -124,13 +126,23 @@ function Rumor(C) {
 			self.tickCount, self.curFetcherId, self.curFetchers, slow, timeout,
 			self.entries.length, self.curFinished, self.curFinishedContent / 1048576.0));
 
-		//clog.info("C:" + self.curFetcherId + " S:" + self.curFetchers + " ES:" + self.entries.length + " FS:" + self.curFinished + " FB:" + self.curFinishedContent);
+		if (self.entries.length < 5) {
+			for (var i =  0; i <  self.lastSeeds.length; i++) {
+				self.entries.push(self.lastSeeds[i]);
+			}
+		}
 		self.curFinished = 0;
 		self.curFinishedContent = 0;
 		self.fireFetchers();
 	}
 
 	this.tick10STimerId = setInterval(this.tick10S, 10000, this);
+
+	this.pushSeed = function(ei) {
+		this.lastSeeds.push(ei);
+		if (this.lastSeeds.length > 20)
+			this.lastSeeds.shift();
+	}
 
 	// ----
 	this.genFetcherId = function() {
@@ -174,6 +186,14 @@ function Rumor(C) {
 	};
 
 	// ----
+	this.insertEntry = function(entry) {
+		if (this.entriesMap[entry.url] !== undefined)
+			return;
+		this.entriesMap[entry.url] = entry;
+		this.entries.unshift(entry);
+	};
+
+	// ----
 	this.addFetcher = function(task) {
 		if (task.registered)
 			return;
@@ -186,7 +206,6 @@ function Rumor(C) {
 		if (sites[task.entry.host] != undefined)
 			sites[task.entry.host] += 1;
 		else {
-			// cllog("[site] " + task.entry.host +  " <= " + task.entry.referer + " | " + this.curFetcherId + " | " + this.entries.length + " | " + this.curFetchers);
 			slog.info(task.entry.host + " == " + task.entry.referer);
 			sites[task.entry.host] = 1;
 		}
@@ -238,6 +257,7 @@ function Fetcher(R, ei) {
 	this.id = R.genFetcherId();
 	this.beginTick = this.rumor.tickCount;
 	this.registered = false;
+	this.timeout = fetcherTimeout;
 
 	if (this.entry.contentSizeLimit)
 		this.contentSizeLimit = this.entry.contentSizeLimit;
@@ -247,23 +267,13 @@ function Fetcher(R, ei) {
 	this.fire = function() {
 		var self = this;
 		this.co = http.createClient(this.entry.port, this.entry.hostname);
-		this.co.setTimeout(30 * 1000);
 
 		this.co.on('close', function(error) {
-			// if (error) {
-			//	console.log("SOCKET-CLOSE");
-			//	console.log(error);
-			//	console.log(error.stack);
-			//}
 			self.clear();
 		});
+
 		this.co.on('error', function(error) {
-			//if (error) {
-			//	console.log("SOCKET-CLOSE");
-			//	console.log(error);
-			//	console.log(error.stack);
-			//}
-			self.clear();
+			// ignore error, and 'close' will be emitted.
 		});
 
 		var headers = {};
@@ -370,12 +380,9 @@ function Planner(rumor) {
 		if (!contentLength)
 			contentLength = fetcher.content.length;
 
-		// if (fetcher.entry.referer)
-		//	if (fetcher.entry.host !== urlparse(fetcher.entry.referer).host)
-		//		cllog(" vvv  " + fetcher.entry.referer);
-	
 		var accu = rumor.entries.length;
 		ulog.info("[200] " + fetcher.entry.url + " == " + fetcher.entry.referer + " {" + contentLength + ":"+ contentType + "} <" + fetcher.id + "/" + (this.rumor.tickCount - fetcher.beginTick) + ">");
+
 		if (accu >= rumor.entriesLimit2) {
 			return;
 		}
@@ -432,6 +439,10 @@ function Planner(rumor) {
 		}
 		*/
 
+		if (entries.length > 40) {
+			rumor.pushSeed(this.entry);
+		}
+
 		var added = entries.length
 		if (accu >= rumor.entriesLimit1 && added > 30) {
 			added = 15;
@@ -449,7 +460,10 @@ function Planner(rumor) {
 
 		for (var i = 0; i < added; i++) {
 			if (entries[i].protocol === "http:")
-				rumor.addEntry(entries[i]);
+				if (entries[i].hostname === fetcher.entry.hostname)
+					rumor.addEntry(entries[i]);
+				else
+					rumor.insertEntry(entries[i]);
 		}
 
 		rumor.fireFetchers();
@@ -482,7 +496,7 @@ function main() {
 	var r = new Rumor(C);
 	r.planner = new Planner(r);
 	r.tagline();
-	var ei = new Entry('http://github.com/');
+	var ei = new Entry('http://freshmeat.net/');
 	r.fireFetcher(ei);
 }
 
