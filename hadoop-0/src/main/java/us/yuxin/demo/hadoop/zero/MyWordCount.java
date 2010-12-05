@@ -67,11 +67,11 @@ public class MyWordCount extends Configured implements Tool {
 		
 		FileInputFormat.addInputPath(job, new Path(args[0]));
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+
+		job.setJarByClass(MyWordCount.class);
 		
 		job.waitForCompletion(true);
 		return 0;
-		
-		
 	}
 	
 	public static void main(String args[]) throws Exception {
