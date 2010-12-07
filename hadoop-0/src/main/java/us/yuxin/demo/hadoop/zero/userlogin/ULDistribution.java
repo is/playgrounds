@@ -3,7 +3,10 @@ package us.yuxin.demo.hadoop.zero.userlogin;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.io.Writable;
@@ -59,5 +62,24 @@ public class ULDistribution implements Writable {
 			outs.writeInt(entry.getKey());
 			outs.writeInt(entry.getValue());
 		}
+	}
+
+	@Override
+	public String toString() {
+		List<Integer> keys = new ArrayList<Integer>(counter.keySet());
+		Collections.sort(keys);
+		
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		
+		for (Integer key : keys) {
+			if (first) {
+				first = false;
+			} else {
+				sb.append(",");
+			}
+			sb.append(key).append(":").append(counter.get(key));
+		}
+		return sb.toString();
 	}
 }
