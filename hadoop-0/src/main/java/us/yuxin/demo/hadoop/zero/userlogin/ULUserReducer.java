@@ -18,7 +18,8 @@ public class ULUserReducer extends
 		for (IntWritable month : values) {
 			uld.add(month.get());
 		}
-		first.set(uld.firstLogin());
+		//first.set(uld.firstLogin());
+		first = new IntWritable(uld.firstLogin());
 		context.write(first, uld);
 	}
 }

@@ -47,6 +47,7 @@ public class ULDistribution implements Writable {
 
 	@Override
 	public void readFields(DataInput ins) throws IOException {
+		counter = new HashMap<Integer,Integer>();
 		int size = ins.readInt();
 		for (int i = 0; i < size; i++) {
 			int k = ins.readInt();

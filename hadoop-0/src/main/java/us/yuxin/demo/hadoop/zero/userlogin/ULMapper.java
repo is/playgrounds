@@ -25,10 +25,13 @@ public class ULMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
 			throws IOException, InterruptedException {
 		StringTokenizer tokenizer = new StringTokenizer(value.toString(), ",");
 		
-		month.set(strToMonth(tokenizer.nextToken()));
+		//month.set(strToMonth(tokenizer.nextToken()));
+		month = new IntWritable(strToMonth(tokenizer.nextToken()));
+
 		tokenizer.nextToken();
 		tokenizer.nextToken();
-		username.set(tokenizer.nextToken());
+		//username.set(tokenizer.nextToken());
+		username = new Text(tokenizer.nextToken());
 		
 		context.write(username, month);
 	}
