@@ -1,0 +1,7 @@
+RELOAD
+~~~~~~
+
+Coarse sample code, demonstrates reloading changed classes
+in single JVM instance.
+
+
