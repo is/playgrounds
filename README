@@ -4,3 +4,4 @@ This repository is my demo project container.
   groovy0 - Groovy shell and script engine, and other demos.
   msgpack-servlet - MP over http servlet.
   deploy - Remote deploy demos.
+  reload - Reload mutable class by individual classloader.

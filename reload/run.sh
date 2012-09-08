@@ -2,6 +2,7 @@
 
 export CLASSPATH=lib/guava-11.0.2.jar
 
+rm -fr o
 mkdir -p o/{m,0,1,s}
 
 javac -Xlint:deprecation -s main -d o/m main/*.java

@@ -12,18 +12,26 @@ public class Main {
 		Runtime runtime = Runtime.getRuntime();
 
 		BaseProcessor proc = null;
+
+		// fileCopy(new File("o/1/Processor.class"), new File("o/m/Processor.class"));
+		// proc = (BaseProcessor)Main.class.getClassLoader().loadClass(classname).newInstance();
+		// proc.print();
+
+		fileCopy(new File("o/m/BaseProcessor.class"), new File("o/s/BaseProcessor.class"));
 		fileCopy(new File("o/0/Processor.class"), new File("o/s/Processor.class"));
 		proc = getProcessor(cp, classname);
 		proc.print();
-
+		System.out.println(" " + proc.getClass() + " - " + proc.getClass().getClassLoader());
 
 		fileCopy(new File("o/1/Processor.class"), new File("o/s/Processor.class"));
 		proc = getProcessor(cp, classname);
 		proc.print();
+		System.out.println(" " + proc.getClass() + " - " + proc.getClass().getClassLoader());
 
 		fileCopy(new File("o/0/Processor.class"), new File("o/s/Processor.class"));
 		proc = getProcessor(cp, classname);
 		proc.print();
+		System.out.println(" " + proc.getClass() + " - " + proc.getClass().getClassLoader());
 	}
 
 	public static BaseProcessor getProcessor(
