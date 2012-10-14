@@ -1,6 +1,7 @@
 This repository is my demo project container.
 
-  hornetq - sample code for JMS/HornetQ and other message queue.
+  accumulo0 - Sample client code for Accumulo.
+  hornetq - Sample code for JMS/HornetQ and other message queue.
   groovy0 - Groovy shell and script engine, and other demos.
   msgpack-servlet - MP over http servlet.
   deploy - Remote deploy demos.
