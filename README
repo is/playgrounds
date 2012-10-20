@@ -7,3 +7,4 @@ This repository is my demo project container.
   deploy - Remote deploy demos.
   reload - Reload mutable class by individual classloader.
   cascading0 - Clone codes from cascading impatient tutorial.
+  accumulo-ingest - Data import to Accumulo by mapreduce
