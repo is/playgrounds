@@ -98,6 +98,7 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
       job.getInt(Ingest.CONF_ACCULUMO_MAX_MEMORY, Ingest.ACCUMULO_MAX_MEMORY),
       job.getInt(Ingest.CONF_ACCUMULO_MAX_LATENCY, Ingest.ACCUMULO_MAX_LATENCY),
       job.getInt(Ingest.CONF_ACCUMULO_MAX_WRITE_THREADS, Ingest.ACCUMULO_MAX_WRITE_THREADS));
+
     columnVisbility = new ColumnVisibility(visibility);
   }
 
@@ -134,16 +135,25 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
       return;
 
     byte[] raw = value.getBytes();
+
     try {
+      if (writer == null) {
+        createConnection();
+      }
+
       Map<String, Object> msg = mapper.readValue(raw, Map.class);
       Text rowId = createRowId(msg);
+
+      System.out.println("rowId:" + rowId.toString());
       if (rowId == null) {
         // TODO ... Error Handler
         return;
       }
 
       Mutation mutation = new Mutation(rowId);
-      mutation.put(new Text("raw"), value, columnVisbility, new Value(new byte[0]));
+      // System.out.println("columnVisbility:" + columnVisbility.toString());
+      // System.out.println("value:" + value);
+      mutation.put(new Text("raw"), new Text(value), columnVisbility, new Value(new byte[0]));
 
       for (String k: msg.keySet()) {
         if (k.startsWith("__"))
@@ -161,12 +171,13 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
           columnVisbility, new Value(v.toString().getBytes()));
       }
 
-      if (writer == null) {
-        createConnection();
-      }
+
 
       writer.addMutation(mutation);
+      // writer.flush();
+      // System.out.println("Write OK:" + rowId.toString());
     } catch (Exception e) {
+      e.printStackTrace();
       // TODO ... Error Handler
     }
   }
