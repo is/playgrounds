@@ -4,8 +4,8 @@
   <groupId>us.yuxin.examples</groupId>
   <artifactId>accumulo-ingest</artifactId>
   <version>0.1.0</version>
-  <name>Hadoop Demo - Zero</name>
-  <description>My first hadoop sample.</description>
+  <name>Accumulo bulk importer</name>
+  <description>Import json data into accumulo by mapreduce</description>
 
   <dependencies>
     <dependency>
