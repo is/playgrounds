@@ -24,12 +24,15 @@ public class Ingest extends Configured implements Tool {
   public final static String CONF_ACCUMULO_MAX_LATENCY = "ingest.accumulo.max.latency";
   public final static String CONF_ACCUMULO_MAX_WRITE_THREADS = "ingest.accumulo.max.write.threads";
   public final static String CONF_INGEST_JAR_PATH = "ingest.jar.path";
+  public final static String CONF_INGEST_STORE_ATTR = "ingest.store.attr";
+//  public final static String CONF_INGEST_MAX_MAP_TASKS = "ingest.max.map.tasks";
 
   protected final static int ACCUMULO_MAX_MEMORY = 1024000;
   protected final static int ACCUMULO_MAX_LATENCY = 1000;
   protected final static int ACCUMULO_MAX_WRITE_THREADS = 2;
 
   protected final static int MAPRED_TASKTRACKER_MAP_TASKS_MAX = 2;
+//  protected final static int INGEST_MAX_MAP_TASKS = 20;
 
   protected void prepareClassPath(Configuration conf) throws IOException {
 
@@ -60,6 +63,9 @@ public class Ingest extends Configured implements Tool {
     job.setJarByClass(IngestMapper.class);
     job.setMapperClass(IngestMapper.class);
 
+//    job.setNumMapTasks(
+//      conf.getInt(CONF_INGEST_MAX_MAP_TASKS,
+//        INGEST_MAX_MAP_TASKS));
     job.setNumReduceTasks(0);
     FileInputFormat.setInputPaths(job, new Path(args[0]));
     JobClient.runJob(job);
@@ -72,7 +78,6 @@ public class Ingest extends Configured implements Tool {
 
     conf.setInt("mapred.tasktracker.map.tasks.maximum",
       MAPRED_TASKTRACKER_MAP_TASKS_MAX);
-
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     if (classLoader == null) {
       classLoader = Ingest.class.getClassLoader();

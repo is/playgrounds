@@ -1,6 +1,7 @@
 package us.yuxin.examples.accumulo.ingest;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,19 +28,24 @@ import org.apache.hadoop.mapred.Reporter;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.msgpack.MessagePack;
+import org.msgpack.packer.Packer;
 
 public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, NullWritable> {
-  ObjectMapper mapper;
+  protected ObjectMapper mapper;
+  protected MessagePack messagePack;
+
   protected DateTimeFormatter timeFmt;
-  AtomicInteger serial;
-  AtomicInteger oidSerial;
+  protected AtomicInteger serial;
+  protected AtomicInteger oidSerial;
 
-  ColumnVisibility columnVisbility;
+  protected ColumnVisibility columnVisbility;
 
-  ZooKeeperInstance instance;
-  Connector connector;
-  BatchWriter writer;
+  protected ZooKeeperInstance instance;
+  protected Connector connector;
+  protected BatchWriter writer;
 
+  protected boolean storeAttirbute;
   JobConf job;
 
   protected Text createRowId(Map<String, Object> data) {
@@ -53,13 +59,13 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
     }
 
     if (ov instanceof Long) {
-      ots = (Long)ov;
+      ots = (Long) ov;
     } else if (ov instanceof Integer) {
       // logger.warn("Invalid logTimestamp(int) - raw-log:" + new String(event.getBody()));
-      ots = ((Integer)ov).longValue();
+      ots = ((Integer) ov).longValue();
     } else if (ov instanceof String) {
       // logger.warn("Invalid logTimestamp(string) - raw-log:" + new String(event.getBody()));
-      ots = Long.parseLong((String)ov);
+      ots = Long.parseLong((String) ov);
     }
 
     if (ots == null) {
@@ -68,12 +74,12 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
       return null;
     }
 
-    Integer oid = (Integer)data.get("oid");
+    Integer oid = (Integer) data.get("oid");
     if (oid == null)
       oid = oidSerial.incrementAndGet();
 
     Integer ser = serial.incrementAndGet();
-    return  new Text(String.format("%s.%04d%04d",
+    return new Text(String.format("%s.%04d%04d",
       timeFmt.print(ots), oid % 10000, ser % 10000));
   }
 
@@ -121,10 +127,15 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
   @Override
   public void configure(JobConf conf) {
     this.job = conf;
+
     mapper = new ObjectMapper();
+    messagePack = new MessagePack();
+
     timeFmt = DateTimeFormat.forPattern("YYYYMMddHHmmssSSS");
     oidSerial = new AtomicInteger(0);
     serial = new AtomicInteger(0);
+
+    storeAttirbute = conf.getBoolean(Ingest.CONF_INGEST_STORE_ATTR, false);
   }
 
 
@@ -151,26 +162,37 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
       }
 
       Mutation mutation = new Mutation(rowId);
-      // System.out.println("columnVisbility:" + columnVisbility.toString());
-      // System.out.println("value:" + value);
       mutation.put(new Text("raw"), new Text(value), columnVisbility, new Value(new byte[0]));
 
-      for (String k: msg.keySet()) {
-        if (k.startsWith("__"))
-          continue;
 
-        Object v = msg.get(k);
-
-        if (v == null)
-          continue;
-
-        if (v.equals(""))
-          continue;
-
-        mutation.put(new Text("a"), new Text(k.toLowerCase()),
-          columnVisbility, new Value(v.toString().getBytes()));
+      ByteArrayOutputStream bos = new ByteArrayOutputStream();
+      Packer packer = messagePack.createPacker(bos);
+      try {
+        packer.write(msg);
+        mutation.put(new Text("mp"), new Text(bos.toByteArray()), columnVisbility, new Value(new byte[0]));
+        bos.close();
+      } catch (IOException e) {
+        // TODO ... Error Handler
       }
 
+
+      if (storeAttirbute) {
+        for (String k : msg.keySet()) {
+          if (k.startsWith("__"))
+            continue;
+
+          Object v = msg.get(k);
+
+          if (v == null)
+            continue;
+
+          if (v.equals(""))
+            continue;
+
+          mutation.put(new Text("a"), new Text(k.toLowerCase()),
+            columnVisbility, new Value(v.toString().getBytes()));
+        }
+      }
 
 
       writer.addMutation(mutation);
@@ -181,7 +203,6 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
       // TODO ... Error Handler
     }
   }
-
 
 
   @Override
