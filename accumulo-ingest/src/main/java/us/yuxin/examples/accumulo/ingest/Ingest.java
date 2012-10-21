@@ -1,10 +1,14 @@
 package us.yuxin.examples.accumulo.ingest;
 
 
+import java.io.IOException;
 import java.net.URL;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.filecache.DistributedCache;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.JobClient;
@@ -18,15 +22,32 @@ public class Ingest extends Configured implements Tool {
   public final static String CONF_ACCULUMO_MAX_MEMORY = "ingest.accumulo.max.memory";
   public final static String CONF_ACCUMULO_MAX_LATENCY = "ingest.accumulo.max.latency";
   public final static String CONF_ACCUMULO_MAX_WRITE_THREADS = "ingest.accumulo.max.write.threads";
+  public final static String CONF_INGEST_JAR_PATH = "ingest.jar.path";
 
   protected final static int ACCUMULO_MAX_MEMORY = 1024000;
   protected final static int ACCUMULO_MAX_LATENCY = 1000;
   protected final static int ACCUMULO_MAX_WRITE_THREADS = 2;
 
 
+  protected void prepareClassPath(Configuration conf) throws IOException {
+
+    FileSystem fs = FileSystem.get(conf);
+
+    FileStatus[] fileStatuses = fs.listStatus(new Path(conf.get(CONF_INGEST_JAR_PATH, "/is/app/ingest/lib")));
+
+    for (FileStatus fileStatus : fileStatuses) {
+      if (fileStatus.getPath().toString().endsWith(".jar")) {
+        DistributedCache.addArchiveToClassPath(fileStatus.getPath(), conf, fs);
+      }
+    }
+    fs.close();
+  }
+
+
   @Override
   public int run(String[] args) throws Exception {
     Configuration conf = getConf();
+    prepareClassPath(conf);
 
     JobConf job = new JobConf(conf);
     job.setJobName(String.format("accumulo-ingest--%d", System.currentTimeMillis()));
