@@ -1,5 +1,4 @@
-package us.yuxin.examples.ingest.accumulo;
-
+package us.yuxin.examples.ingest.hbase;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,16 +7,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.base.Splitter;
-import org.apache.accumulo.core.client.AccumuloException;
-import org.apache.accumulo.core.client.AccumuloSecurityException;
-import org.apache.accumulo.core.client.BatchWriter;
-import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.MutationsRejectedException;
-import org.apache.accumulo.core.client.TableNotFoundException;
-import org.apache.accumulo.core.client.ZooKeeperInstance;
-import org.apache.accumulo.core.data.Mutation;
-import org.apache.accumulo.core.data.Value;
-import org.apache.accumulo.core.security.ColumnVisibility;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -31,24 +24,23 @@ import org.joda.time.format.DateTimeFormatter;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 
-public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, NullWritable> {
-  protected ObjectMapper mapper;
+
+public class HIngestMapper implements Mapper<LongWritable, Text, NullWritable, NullWritable> {
+  ObjectMapper mapper;
   protected MessagePack messagePack;
 
   protected DateTimeFormatter timeFmt;
+
   protected AtomicInteger serial;
   protected AtomicInteger oidSerial;
 
-  protected ColumnVisibility columnVisbility;
-
-  protected ZooKeeperInstance instance;
-  protected Connector connector;
-  protected BatchWriter writer;
-
   protected boolean storeAttirbute;
-  JobConf job;
 
-  protected Text createRowId(Map<String, Object> data) {
+  protected JobConf job;
+  protected Configuration hbase;
+  protected HTable hTable;
+
+  protected byte[] createRowId(Map<String, Object> data) {
     Long ots = null;
     Object ov;
 
@@ -79,48 +71,50 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
       oid = oidSerial.incrementAndGet();
 
     Integer ser = serial.incrementAndGet();
-    return new Text(String.format("%s.%04d%04d",
-      timeFmt.print(ots), oid % 10000, ser % 10000));
+    return String.format("%s.%04d%04d",
+      timeFmt.print(ots), oid % 10000, ser % 10000).getBytes();
   }
 
 
-  protected void createConnection()
-    throws AccumuloSecurityException, AccumuloException, TableNotFoundException {
+  protected void createConnection() throws IOException {
 
-    String connectionToken = job.get(Ingest.CONF_ACCULUMO_CONNECTION_TOKEN);
+    String connectToken = job.get(HIngest.CONF_HBASE_CONNECT_TOKEN);
+    Iterator<String> tokens = Splitter.on("///").split(connectToken).iterator();
 
-    Iterator<String> tokens = Splitter.on(':').split(connectionToken).iterator();
-
-    String instanceName = tokens.next();
     String zooKeepers = tokens.next();
-    String user = tokens.next();
-    String password = tokens.next();
-    String visibility = tokens.next();
     String tableName = tokens.next();
 
-    instance = new ZooKeeperInstance(instanceName, zooKeepers);
-    connector = instance.getConnector(user, password.getBytes());
-    writer = connector.createBatchWriter(tableName,
-      job.getInt(Ingest.CONF_ACCULUMO_MAX_MEMORY, Ingest.ACCUMULO_MAX_MEMORY),
-      job.getInt(Ingest.CONF_ACCUMULO_MAX_LATENCY, Ingest.ACCUMULO_MAX_LATENCY),
-      job.getInt(Ingest.CONF_ACCUMULO_MAX_WRITE_THREADS, Ingest.ACCUMULO_MAX_WRITE_THREADS));
+    hbase = HBaseConfiguration.create();
 
-    columnVisbility = new ColumnVisibility(visibility);
+    if (zooKeepers.contains(":")) {
+      int off = zooKeepers.indexOf(":");
+      hbase.set("hbase.zookeeper.quorum", zooKeepers.substring(0, off));
+      hbase.set("hbase.zookeeper.property.clientPort", zooKeepers.substring(off + 1));
+    } else {
+      hbase.set("hbase.zookeeper.quorum", zooKeepers);
+    }
+
+
+    hTable = new HTable(hbase, tableName);
+    hTable.setAutoFlush(false);
   }
 
 
   protected void closeConnection() {
-    if (writer != null) {
+    hTable = null;
+    if (hTable != null) {
       try {
-        writer.close();
-      } catch (MutationsRejectedException e) {
-        // TODO: logger.warn("Unable to shutdown Accumulo Batch Writer", e);
+        if (hTable != null) {
+          hTable.flushCommits();
+          hTable.close();
+        }
+      } catch (IOException e) {
+        // TODO logger
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
       }
-      writer = null;
+      hTable = null;
     }
-
-    connector = null;
-    instance = null;
+    hbase = null;
   }
 
 
@@ -135,7 +129,14 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
     oidSerial = new AtomicInteger(0);
     serial = new AtomicInteger(0);
 
-    storeAttirbute = conf.getBoolean(Ingest.CONF_INGEST_STORE_ATTR, false);
+    storeAttirbute = conf.getBoolean(HIngest.CONF_INGEST_STORE_ATTR, false);
+
+    try {
+      createConnection();
+    } catch (IOException e) {
+      e.printStackTrace();
+      // TODO Error handler
+    }
   }
 
 
@@ -145,36 +146,34 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
     if (value.getLength() == 0)
       return;
 
-    byte[] raw = value.getBytes();
+    String text = value.toString();
+    byte[] raw = text.getBytes();
 
+    // System.out.println("VALUE:" + value + ", bytes[]:" + raw + ", length:" + raw.length);
     try {
-      if (writer == null) {
-        createConnection();
-      }
-
       Map<String, Object> msg = mapper.readValue(raw, Map.class);
-      Text rowId = createRowId(msg);
 
-      System.out.println("rowId:" + rowId.toString());
+      byte[] rowId = createRowId(msg);
       if (rowId == null) {
         // TODO ... Error Handler
         return;
       }
 
-      Mutation mutation = new Mutation(rowId);
-      mutation.put(new Text("raw"), new Text(value), columnVisbility, new Value(new byte[0]));
+      Put put = new Put(rowId);
+      put.setWriteToWAL(false);
 
+      put.add("raw".getBytes(), new byte[0], raw);
 
       ByteArrayOutputStream bos = new ByteArrayOutputStream();
       Packer packer = messagePack.createPacker(bos);
       try {
         packer.write(msg);
-        mutation.put(new Text("mp"), new Text(bos.toByteArray()), columnVisbility, new Value(new byte[0]));
+        put.add("mp".getBytes(), new byte[0], bos.toByteArray());
         bos.close();
       } catch (IOException e) {
+        e.printStackTrace();
         // TODO ... Error Handler
       }
-
 
       if (storeAttirbute) {
         for (String k : msg.keySet()) {
@@ -189,15 +188,10 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
           if (v.equals(""))
             continue;
 
-          mutation.put(new Text("a"), new Text(k.toLowerCase()),
-            columnVisbility, new Value(v.toString().getBytes()));
+          put.add("a".getBytes(), k.toLowerCase().getBytes(), v.toString().getBytes());
         }
+        hTable.put(put);
       }
-
-
-      writer.addMutation(mutation);
-      // writer.flush();
-      // System.out.println("Write OK:" + rowId.toString());
     } catch (Exception e) {
       e.printStackTrace();
       // TODO ... Error Handler
