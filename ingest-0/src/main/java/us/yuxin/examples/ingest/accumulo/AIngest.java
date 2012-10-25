@@ -57,7 +57,7 @@ public class AIngest extends Configured implements Tool {
 
     JobConf job = new JobConf(conf);
 
-    job.setJobName(String.format("accumulo-ingest--%d", System.currentTimeMillis()));
+    job.setJobName(String.format("ingest-accumulo-%d", System.currentTimeMillis()));
     job.setInputFormat(TextInputFormat.class);
     job.setOutputFormat(NullOutputFormat.class);
 
