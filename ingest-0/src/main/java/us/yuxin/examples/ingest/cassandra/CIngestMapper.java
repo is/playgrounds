@@ -36,6 +36,7 @@ public class CIngestMapper implements Mapper<LongWritable, Text, NullWritable, N
   JobConf job;
   protected boolean storeAttirbute;
 
+  MutationBatch mb;
   protected ObjectMapper mapper;
   protected MessagePack messagePack;
 
@@ -104,8 +105,10 @@ public class CIngestMapper implements Mapper<LongWritable, Text, NullWritable, N
       return;
     }
 
-    MutationBatch m = ks.prepareMutationBatch();
-    ColumnListMutation<String> c = m.withRow(cf, rowId);
+    if (mb == null) {
+      mb = ks.prepareMutationBatch();
+    }
+    ColumnListMutation<String> c = mb.withRow(cf, rowId);
     c.putColumn("raw", value.toString(), null);
 
     if (storeAttirbute) {
@@ -126,9 +129,13 @@ public class CIngestMapper implements Mapper<LongWritable, Text, NullWritable, N
     }
 
     try {
-      OperationResult<Void> result = m.execute();
+      if (mb.getRowCount() > 300) {
+        OperationResult<Void> result = mb.execute();
+        mb = null;
+      }
     } catch (ConnectionException e) {
       e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      mb = null;
     }
   }
 
@@ -136,6 +143,13 @@ public class CIngestMapper implements Mapper<LongWritable, Text, NullWritable, N
 
   @Override
   public void close() throws IOException {
+    if (mb != null && ! mb.isEmpty()) {
+      try {
+        OperationResult<Void> result = mb.execute();
+      } catch (ConnectionException e) {
+        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      }
+    }
     context.shutdown();
   }
 
