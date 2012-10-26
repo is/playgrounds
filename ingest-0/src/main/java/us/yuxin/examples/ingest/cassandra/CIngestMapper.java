@@ -63,13 +63,13 @@ public class CIngestMapper implements Mapper<LongWritable, Text, NullWritable, N
     Iterator<String> tokens = Splitter.on("///").split(job.get(CIngest.CONF_CASSANDRA_CONNECT_TOKEN)).iterator();
 
     String clusterName = tokens.next();
-    String keyspaceName = tokens.next();
     String seeds = tokens.next();
+    String keyspaceName = tokens.next();
     String columeFamilyName = tokens.next();
 
     context = new AstyanaxContext.Builder()
       .forCluster(clusterName).forKeyspace(keyspaceName)
-      .withAstyanaxConfiguration(new AstyanaxConfigurationImpl().setDiscoveryType(NodeDiscoveryType.NONE))
+      .withAstyanaxConfiguration(new AstyanaxConfigurationImpl().setDiscoveryType(NodeDiscoveryType.TOKEN_AWARE))
       .withConnectionPoolConfiguration(new ConnectionPoolConfigurationImpl("cp")
         .setPort(9160)
         .setMaxConnsPerHost(2)
