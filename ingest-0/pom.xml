@@ -66,6 +66,12 @@
       <artifactId>hbase</artifactId>
       <version>0.94.1</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.netflix.astyanax</groupId>
+      <artifactId>astyanax</artifactId>
+      <version>1.0.3</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -83,4 +89,4 @@
   </build>
 </project>
 
-        <!-- vim:set ts=2 sts=2 ai: -->
+  <!-- vim:set ts=2 sts=2 ai: -->

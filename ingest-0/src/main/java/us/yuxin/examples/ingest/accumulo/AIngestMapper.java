@@ -155,7 +155,7 @@ public class AIngestMapper implements Mapper<LongWritable, Text, NullWritable, N
       Map<String, Object> msg = mapper.readValue(raw, Map.class);
       Text rowId = createRowId(msg);
 
-      System.out.println("rowId:" + rowId.toString());
+      // System.out.println("rowId:" + rowId.toString());
       if (rowId == null) {
         // TODO ... Error Handler
         return;
