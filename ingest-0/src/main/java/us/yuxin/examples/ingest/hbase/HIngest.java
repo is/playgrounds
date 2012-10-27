@@ -1,4 +1,4 @@
-package us.yuxin.examples.accumulo.ingest;
+package us.yuxin.examples.ingest.hbase;
 
 
 import java.io.IOException;
@@ -18,40 +18,17 @@ import org.apache.hadoop.mapred.lib.NullOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class Ingest extends Configured implements Tool {
-  public final static String CONF_ACCULUMO_CONNECTION_TOKEN = "ingest.accumulo.token";
-  public final static String CONF_ACCULUMO_MAX_MEMORY = "ingest.accumulo.max.memory";
-  public final static String CONF_ACCUMULO_MAX_LATENCY = "ingest.accumulo.max.latency";
-  public final static String CONF_ACCUMULO_MAX_WRITE_THREADS = "ingest.accumulo.max.write.threads";
-  public final static String CONF_INGEST_JAR_PATH = "ingest.jar.path";
+
+public class HIngest extends Configured implements Tool {
+  public final static String CONF_HBASE_CONNECT_TOKEN = "ingest.hbase.token";
+  public final static String CONF_HBASE_JAR_PATH = "ingest.hbase.jar.path";
   public final static String CONF_INGEST_STORE_ATTR = "ingest.store.attr";
 
-  protected final static int ACCUMULO_MAX_MEMORY = 1024000;
-  protected final static int ACCUMULO_MAX_LATENCY = 1000;
-  protected final static int ACCUMULO_MAX_WRITE_THREADS = 2;
-
-  protected final static int MAPRED_TASKTRACKER_MAP_TASKS_MAX = 2;
-
   protected void prepareClassPath(Configuration conf) throws IOException {
 
     FileSystem fs = FileSystem.get(conf);
 
-    FileStatus[] fileStatuses = fs.listStatus(new Path(conf.get(CONF_INGEST_JAR_PATH, "/is/app/ingest/lib")));
-
-    for (FileStatus fileStatus : fileStatuses) {
-      if (fileStatus.getPath().toString().endsWith(".jar")) {
-        DistributedCache.addArchiveToClassPath(fileStatus.getPath(), conf, fs);
-      }
-    }
-    fs.close();
-  }
-
-
-  protected void prepareClassPath(Configuration conf) throws IOException {
-
-    FileSystem fs = FileSystem.get(conf);
-
-    FileStatus[] fileStatuses = fs.listStatus(new Path(conf.get(CONF_INGEST_JAR_PATH, "/is/app/ingest/lib")));
+    FileStatus[] fileStatuses = fs.listStatus(new Path(conf.get(CONF_HBASE_JAR_PATH, "/is/app/ingest/hbase/lib")));
 
     for (FileStatus fileStatus : fileStatuses) {
       if (fileStatus.getPath().toString().endsWith(".jar")) {
@@ -68,17 +45,13 @@ public class Ingest extends Configured implements Tool {
     prepareClassPath(conf);
 
     JobConf job = new JobConf(conf);
-
-    job.setJobName(String.format("accumulo-ingest--%d", System.currentTimeMillis()));
+    job.setJobName(String.format("ingest-hbase--%d", System.currentTimeMillis()));
     job.setInputFormat(TextInputFormat.class);
     job.setOutputFormat(NullOutputFormat.class);
 
-    job.setJarByClass(IngestMapper.class);
-    job.setMapperClass(IngestMapper.class);
+    job.setJarByClass(HIngestMapper.class);
+    job.setMapperClass(HIngestMapper.class);
 
-//    job.setNumMapTasks(
-//      conf.getInt(CONF_INGEST_MAX_MAP_TASKS,
-//        INGEST_MAX_MAP_TASKS));
     job.setNumReduceTasks(0);
     FileInputFormat.setInputPaths(job, new Path(args[0]));
     JobClient.runJob(job);
@@ -89,11 +62,9 @@ public class Ingest extends Configured implements Tool {
   protected static Configuration prepareConfiguration() {
     Configuration conf = new Configuration();
 
-    conf.setInt("mapred.tasktracker.map.tasks.maximum",
-      MAPRED_TASKTRACKER_MAP_TASKS_MAX);
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     if (classLoader == null) {
-      classLoader = Ingest.class.getClassLoader();
+      classLoader = HIngest.class.getClassLoader();
     }
 
     URL defaultURL = classLoader.getResource("ingest-default.xml");
@@ -103,13 +74,14 @@ public class Ingest extends Configured implements Tool {
     URL siteURL = classLoader.getResource("ingest-site.xml");
     if (siteURL != null)
       conf.addResource(siteURL);
+
     return conf;
   }
 
 
   public static void main(String[] args) throws Exception {
     Configuration conf = prepareConfiguration();
-    int res = ToolRunner.run(conf, new Ingest(), args);
+    int res = ToolRunner.run(conf, new HIngest(), args);
     System.exit(res);
   }
 }

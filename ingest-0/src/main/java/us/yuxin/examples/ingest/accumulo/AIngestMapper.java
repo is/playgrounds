@@ -1,4 +1,4 @@
-package us.yuxin.examples.accumulo.ingest;
+package us.yuxin.examples.ingest.accumulo;
 
 
 import java.io.ByteArrayOutputStream;
@@ -31,7 +31,7 @@ import org.joda.time.format.DateTimeFormatter;
 import org.msgpack.MessagePack;
 import org.msgpack.packer.Packer;
 
-public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, NullWritable> {
+public class AIngestMapper implements Mapper<LongWritable, Text, NullWritable, NullWritable> {
   protected ObjectMapper mapper;
   protected MessagePack messagePack;
 
@@ -87,7 +87,7 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
   protected void createConnection()
     throws AccumuloSecurityException, AccumuloException, TableNotFoundException {
 
-    String connectionToken = job.get(Ingest.CONF_ACCULUMO_CONNECTION_TOKEN);
+    String connectionToken = job.get(AIngest.CONF_ACCULUMO_CONNECTION_TOKEN);
 
     Iterator<String> tokens = Splitter.on(':').split(connectionToken).iterator();
 
@@ -101,9 +101,9 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
     instance = new ZooKeeperInstance(instanceName, zooKeepers);
     connector = instance.getConnector(user, password.getBytes());
     writer = connector.createBatchWriter(tableName,
-      job.getInt(Ingest.CONF_ACCULUMO_MAX_MEMORY, Ingest.ACCUMULO_MAX_MEMORY),
-      job.getInt(Ingest.CONF_ACCUMULO_MAX_LATENCY, Ingest.ACCUMULO_MAX_LATENCY),
-      job.getInt(Ingest.CONF_ACCUMULO_MAX_WRITE_THREADS, Ingest.ACCUMULO_MAX_WRITE_THREADS));
+      job.getInt(AIngest.CONF_ACCULUMO_MAX_MEMORY, AIngest.ACCUMULO_MAX_MEMORY),
+      job.getInt(AIngest.CONF_ACCUMULO_MAX_LATENCY, AIngest.ACCUMULO_MAX_LATENCY),
+      job.getInt(AIngest.CONF_ACCUMULO_MAX_WRITE_THREADS, AIngest.ACCUMULO_MAX_WRITE_THREADS));
 
     columnVisbility = new ColumnVisibility(visibility);
   }
@@ -135,7 +135,7 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
     oidSerial = new AtomicInteger(0);
     serial = new AtomicInteger(0);
 
-    storeAttirbute = conf.getBoolean(Ingest.CONF_INGEST_STORE_ATTR, false);
+    storeAttirbute = conf.getBoolean(AIngest.CONF_INGEST_STORE_ATTR, false);
   }
 
 
@@ -155,7 +155,7 @@ public class IngestMapper implements Mapper<LongWritable, Text, NullWritable, Nu
       Map<String, Object> msg = mapper.readValue(raw, Map.class);
       Text rowId = createRowId(msg);
 
-      System.out.println("rowId:" + rowId.toString());
+      // System.out.println("rowId:" + rowId.toString());
       if (rowId == null) {
         // TODO ... Error Handler
         return;

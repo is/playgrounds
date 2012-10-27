@@ -1,4 +1,4 @@
-package us.yuxin.examples.accumulo.ingest;
+package us.yuxin.examples.ingest.accumulo;
 
 
 import java.io.IOException;
@@ -23,35 +23,22 @@ public class Ingest extends Configured implements Tool {
   public final static String CONF_ACCULUMO_MAX_MEMORY = "ingest.accumulo.max.memory";
   public final static String CONF_ACCUMULO_MAX_LATENCY = "ingest.accumulo.max.latency";
   public final static String CONF_ACCUMULO_MAX_WRITE_THREADS = "ingest.accumulo.max.write.threads";
-  public final static String CONF_INGEST_JAR_PATH = "ingest.jar.path";
+  public final static String CONF_ACCUMULO_JAR_PATH = "ingest.accumlo.jar.path";
   public final static String CONF_INGEST_STORE_ATTR = "ingest.store.attr";
+//  public final static String CONF_INGEST_MAX_MAP_TASKS = "ingest.max.map.tasks";
 
   protected final static int ACCUMULO_MAX_MEMORY = 1024000;
   protected final static int ACCUMULO_MAX_LATENCY = 1000;
   protected final static int ACCUMULO_MAX_WRITE_THREADS = 2;
 
   protected final static int MAPRED_TASKTRACKER_MAP_TASKS_MAX = 2;
+//  protected final static int INGEST_MAX_MAP_TASKS = 20;
 
   protected void prepareClassPath(Configuration conf) throws IOException {
 
     FileSystem fs = FileSystem.get(conf);
 
-    FileStatus[] fileStatuses = fs.listStatus(new Path(conf.get(CONF_INGEST_JAR_PATH, "/is/app/ingest/lib")));
-
-    for (FileStatus fileStatus : fileStatuses) {
-      if (fileStatus.getPath().toString().endsWith(".jar")) {
-        DistributedCache.addArchiveToClassPath(fileStatus.getPath(), conf, fs);
-      }
-    }
-    fs.close();
-  }
-
-
-  protected void prepareClassPath(Configuration conf) throws IOException {
-
-    FileSystem fs = FileSystem.get(conf);
-
-    FileStatus[] fileStatuses = fs.listStatus(new Path(conf.get(CONF_INGEST_JAR_PATH, "/is/app/ingest/lib")));
+    FileStatus[] fileStatuses = fs.listStatus(new Path(conf.get(CONF_ACCUMULO_JAR_PATH, "/is/app/ingest/accumulo/lib")));
 
     for (FileStatus fileStatus : fileStatuses) {
       if (fileStatus.getPath().toString().endsWith(".jar")) {

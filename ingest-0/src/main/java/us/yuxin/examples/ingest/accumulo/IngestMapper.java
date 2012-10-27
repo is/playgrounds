@@ -1,4 +1,4 @@
-package us.yuxin.examples.accumulo.ingest;
+package us.yuxin.examples.ingest.accumulo;
 
 
 import java.io.ByteArrayOutputStream;
