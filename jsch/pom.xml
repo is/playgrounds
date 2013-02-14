@@ -15,11 +15,13 @@
       <version>0.1.49</version>
     </dependency>
 
+    <!--
     <dependency>
       <groupId>org.jclouds.driver</groupId>
       <artifactId>jclouds-jsch</artifactId>
       <version>1.5.4</version>
     </dependency>
+    -->
 
   </dependencies>
 </project>
