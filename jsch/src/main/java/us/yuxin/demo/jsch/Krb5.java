@@ -14,7 +14,9 @@ public class Krb5 {
 
     JSch jsch = new JSch();
     Session session = jsch.getSession("root", host, port);
+    session.setConfig("StrictHostKeyChecking", "no");
     session.setUserInfo(new NonInteractiveUserInfo());
+
     session.connect(30000);
     Channel channel = session.openChannel("shell");
     channel.setInputStream(System.in);
