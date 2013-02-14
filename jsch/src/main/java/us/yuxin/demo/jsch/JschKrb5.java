@@ -7,7 +7,7 @@ import com.jcraft.jsch.Logger;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.UserInfo;
 
-public class Krb5 {
+public class JschKrb5 {
   public static final Logger SIMPLE_LOGGER=new Logger(){
     public boolean isEnabled(int level){return true;}
     public void log(int level, String message){System.err.println(message);}
