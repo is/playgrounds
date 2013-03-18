@@ -14,36 +14,23 @@ object Main {
     val config = ConfigFactory.parseFile(new File("application.json"))
 
     val feed = new Feeder(config.getConfig("chdbits"))
-    //    feed.login
-    //
-    //    println ("--0--")
-    //    println (feed.torrents(0))
-    //
-    //    println ("--1--")
-    //    println (feed.torrents(1))
-    //    println (feed.http)
 
-    //    val lines = scala.io.Source.fromFile("page0.html").mkString
-    //    feed.rBig.findAllIn(lines).foreach { block =>
-    //      var i = feed.parseTorrentInfo(block).get
-    //
-    //      println("%s: [%s] %s - %.3f".format(i.id, i.category, i.name,  i.size))
-    //    }
-
-    val tc = new TransmissionClient(config.getConfig("transmission.h6s"))
+    val tc = new TransmissionClient(config.getConfig("transmission.ovh"))
     feed.login()
-    feed.torrentInfos.filter({
+    feed.torrentInfos().filter({
       _.rate eq "free"
     }).foreach {
       i =>
-        println("%s: [%s] %s - %.3f -- %s".format(i.id, i.category, i.name, i.size, i.rate))
+        println("%s: [%s] %s - %.3f -- %s %d/%d/%d - %s".format(
+          i.id, i.category, i.name, i.size, i.rate,
+          i.seed, i.leech, i.download, i.bookmarked))
         val path = config.getString("download.path") + "/" + i.torrentFilename;
         if (!new File(path).exists()) {
-          feed.downloadTorrent(i.id, path)
-          println("save to" + i.torrentFilename)
-          val source = scala.io.Source.fromFile(path, "ISO-8859-1")
-          val torrent = source.map(_.toByte).toArray
-          source.close
+          val torrent = feed.downloadTorrent(i.id)
+          println("save to: " + i.torrentFilename)
+          val fos = new FileOutputStream(path)
+          fos.write(torrent)
+          fos.close
           tc.addTorrent(i, torrent)
         } else {
           println("skipped")

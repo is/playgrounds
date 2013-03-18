@@ -25,7 +25,7 @@ class TransmissionClient (cf:Config) {
       ("method" -> "torrent-add") ~
       ("arguments" ->
         ("paused" -> true) ~
-        ("metainfo" -> new sun.misc.BASE64Encoder().encode(torrent).replace("\n", "")))
+        ("metainfo" -> new sun.misc.BASE64Encoder().encode(torrent).replace("\r", "").replace("\n", "")))
 
     val reqJson = compact(render(json))
 

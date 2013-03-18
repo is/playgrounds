@@ -6,7 +6,7 @@ import dispatch.{:/, Http}
 import com.typesafe.config.Config
 import util.matching.Regex
 import collection.mutable.ListBuffer
-import java.io.FileOutputStream
+import java.io.{ByteArrayOutputStream, FileOutputStream}
 
 class Feeder(username: String, password: String, depth: Int) {
   def this(username: String, password: String) = this(username, password, 5)
@@ -27,15 +27,21 @@ class Feeder(username: String, password: String, depth: Int) {
   private val downloadUrl = baseUrl / "download.php"
 
 
-  private val rBig = """(?s)<tr.{1,16}<td class="rowfollow nowrap" valign="middle" style='padding: 0px'>.+?</table>.+?</tr>""".r
+  private val rBig = """(?s)<tr.{1,26}<td class="rowfollow nowrap" valign="middle" style='padding: 0px'>.+?</table>.+?</tr>""".r
   private val rDetail = new Regex(
-    """(?m)(?s)img class="c_(.+?)" src=.+?addsprites.gif\);" alt="(.+?)".+? href="details.php\?id=(\d+)&amp;hit=1" ><b>""" +
-      """(.+?)</b></a><br />(.+?)</td>.+?</span></td><td class="rowfollow">(.+?)<br />(.+?)</td>""" +
-      """<td class="rowfollow" align="center">(.+?)</td>.+?<td class="rowfollow">(.+?)</td>.+?<td class="rowfollow">(.+?)</td>""" +
-      """.+?<td class="rowfollow">(.+?)</td>""",
-    "category", "encode", "id", "name", "desc", "size", "unit", "seeds", "leechs", "downloads", "publisher")
+    """(?m)(?s)img class="c_(.+?)"""" + //category
+    """ src=.+?addsprites.gif\);" alt="(.+?)"""" + //encode
+    """.+? href="details.php\?id=(\d+)&amp;hit=1" ><b>""" + // id
+    """(.+?)</b></a><br />(.+?)</td>""" + //name & desc
+    """.+?alt="(Unbookmarked|Bookmarked)"""" + // bookmarked
+    """.+?</span></td><td class="rowfollow">(.+?)<br />(.+?)</td>""" + // size & unit
+    """<td class="rowfollow" align="center">(.+?)</td>""" +
+    """.+?<td class="rowfollow">(.+?)</td>""" +
+    """.+?<td class="rowfollow">(.+?)</td>""" +
+    """.+?<td class="rowfollow">(.+?)</td>""",
+    "category", "encode", "id", "name", "desc", "bookmarked", "size", "unit", "seeds", "leechs", "downloads", "publisher")
   private val rNumber = """>(\d+)<""".r
-  private val rDesc = """(.+?) <img class="pro_(.+?)"""".r
+  private val rDesc = """(.*?) <img class="pro_(.+?)"""".r
 
   def urlEncode(s: String) = URLEncoder.encode(s, "utf8")
 
@@ -78,21 +84,29 @@ class Feeder(username: String, password: String, depth: Int) {
         if (d.indexOf("<img") == -1)
           (d, "100")
         else {
-          val dm = rDesc.findFirstMatchIn(d).get
+          val cdm = rDesc.findFirstMatchIn(d)
+          if (cdm == None) {
+            println(d)
+          }
+          val dm = cdm.get
           val rMap = Map("50pctdown" -> "50", "free" -> "free")
           (dm.group(1), rMap.getOrElse(dm.group(2), dm.group(2)))
         }
       }
 
       Some(new ItemInfo(
-        m.group("id"), m.group("name"),
-        m.group("category"),
-        m.group("encode"), desc,
-        rate, gbSize(m.group("size"), m.group("unit")),
-        toNumber(m.group("seeds")),
-        toNumber(m.group("leechs")),
-        toNumber(m.group("downloads")),
-        "anonymous"))
+        id = m.group("id"),
+        name = m.group("name"),
+        category = m.group("category"),
+        encode = m.group("encode"),
+        desc = desc,
+        bookmarked = m.group("bookmarked") == "Bookmarked",
+        rate = rate,
+        size = gbSize(m.group("size"), m.group("unit")),
+        seed = toNumber(m.group("seeds")),
+        leech = toNumber(m.group("leechs")),
+        download = toNumber(m.group("downloads")),
+        publisher = "anonymous"))
     }
   }
 
@@ -114,6 +128,13 @@ class Feeder(username: String, password: String, depth: Int) {
     val fos = new FileOutputStream(fn)
     http(downloadUrl <<? Map("id"->id) >>> fos)
     fos.close()
+  }
+
+  def downloadTorrent(id:String):Array[Byte] = {
+    val bs = new ByteArrayOutputStream()
+    http(downloadUrl <<? Map("id"->id) >>> bs)
+    bs.close()
+    bs.toByteArray()
   }
 }
 
