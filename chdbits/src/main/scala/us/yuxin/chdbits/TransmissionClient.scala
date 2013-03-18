@@ -5,10 +5,18 @@ import net.liftweb.json.JsonDSL._
 import com.typesafe.config.Config
 import dispatch.{url, Http}
 
-class TransmissionClient (cf:Config, clientName:String) {
+class TransmissionClient (cf:Config) {
   val http = Http
+  lazy val req = {
+    val req = url(cf.getString("url"))
+    if (cf.hasPath("username"))
+      req.as(cf.getString("username"), cf.getString("password"))
+    else
+      req
+  }
+
   lazy val sessionId = {
-    val s = http.x((url("http://ovh:9091/transmission/rpc") as("xx", "xxxxxxx")) >:> identity)
+    val s = http.x(req >:> identity)
     s.get("X-Transmission-Session-Id").get.head
   }
 
@@ -23,8 +31,7 @@ class TransmissionClient (cf:Config, clientName:String) {
 
     println("send:" + reqJson)
 
-    val res = http (
-      (url("http://ovh:9091/transmission/rpc") as("xx", "xxxxxxx"))
+    val res = http (req
         <:< Map("X-Transmission-Session-Id" -> sessionId)
         << (reqJson, "application/json") as_str)
     println(res)

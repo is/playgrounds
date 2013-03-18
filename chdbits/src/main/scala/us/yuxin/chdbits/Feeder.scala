@@ -27,7 +27,7 @@ class Feeder(username: String, password: String, depth: Int) {
   private val downloadUrl = baseUrl / "download.php"
 
 
-  private val rBig = """(?s)<tr>.{1,6}<td class="rowfollow nowrap" valign="middle" style='padding: 0px'>.+?</table>.+?</tr>""".r
+  private val rBig = """(?s)<tr.{1,16}<td class="rowfollow nowrap" valign="middle" style='padding: 0px'>.+?</table>.+?</tr>""".r
   private val rDetail = new Regex(
     """(?m)(?s)img class="c_(.+?)" src=.+?addsprites.gif\);" alt="(.+?)".+? href="details.php\?id=(\d+)&amp;hit=1" ><b>""" +
       """(.+?)</b></a><br />(.+?)</td>.+?</span></td><td class="rowfollow">(.+?)<br />(.+?)</td>""" +
