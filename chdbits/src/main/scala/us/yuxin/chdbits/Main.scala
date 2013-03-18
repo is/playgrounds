@@ -11,9 +11,9 @@ object Main {
   def foo(x: Array[String]) = x.foldLeft("")((a, b) => a + b)
 
   def main(args: Array[String]) {
-    val config = ConfigFactory.parseFile(new File("application.conf"))
+    val config = ConfigFactory.parseFile(new File("application.json"))
 
-    val feed = new Feeder(config)
+    val feed = new Feeder(config.getConfig("chdbits"))
     //    feed.login
     //
     //    println ("--0--")
@@ -30,11 +30,8 @@ object Main {
     //      println("%s: [%s] %s - %.3f".format(i.id, i.category, i.name,  i.size))
     //    }
 
-    val tc = new TransmissionClient(config, "h6s")
-
+    val tc = new TransmissionClient(config.getConfig("transmission.h6s"))
     feed.login()
-
-
     feed.torrentInfos.filter({
       _.rate eq "free"
     }).foreach {
