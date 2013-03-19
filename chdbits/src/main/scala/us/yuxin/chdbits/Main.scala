@@ -17,8 +17,8 @@ object Main {
 
     val tc = new TransmissionClient(config.getConfig("transmission.ovh"))
     feed.login()
-    feed.torrentInfos().filter({
-      _.rate eq "free"
+    feed.torrentInfos().filter({ i=>
+      (i.rate eq "free") && (!i.bookmarked)
     }).foreach {
       i =>
         println("%s: [%s] %s - %.3f -- %s %d/%d/%d - %s".format(
@@ -30,7 +30,7 @@ object Main {
           println("save to: " + i.torrentFilename)
           val fos = new FileOutputStream(path)
           fos.write(torrent)
-          fos.close
+          fos.close()
           tc.addTorrent(i, torrent)
         } else {
           println("skipped")
