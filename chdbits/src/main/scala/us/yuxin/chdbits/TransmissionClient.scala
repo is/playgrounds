@@ -3,7 +3,7 @@ package us.yuxin.chdbits
 import net.liftweb.json._
 import net.liftweb.json.JsonDSL._
 import com.typesafe.config.Config
-import dispatch.{url, Http}
+import dispatch.classic.{url, Http}
 
 class TransmissionClient (cf:Config) {
   val http = Http

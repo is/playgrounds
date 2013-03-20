@@ -2,7 +2,7 @@ package us.yuxin.chdbits
 
 import java.net.URLEncoder
 
-import dispatch.{:/, Http}
+import dispatch.classic.{url, Http}
 import com.typesafe.config.Config
 import util.matching.Regex
 import collection.mutable.ListBuffer
@@ -20,8 +20,8 @@ class Feeder(username: String, password: String, depth: Int) {
   private val loginForm = "username=" + urlEncode(username) + "&password=" + urlEncode(password)
   val http = new Http
 
-  private val baseUrl = :/ ("chdbits.org")
-  // private val baseUrl = :/("chdbits.org").secure
+  private val baseUrl = url("chdbits.org")
+  // private val baseUrl = url("chdbits.org").secure
   private val loginUrl = baseUrl / "takelogin.php"
   private val torrentsUrl = baseUrl / "torrents.php"
   private val downloadUrl = baseUrl / "download.php"
