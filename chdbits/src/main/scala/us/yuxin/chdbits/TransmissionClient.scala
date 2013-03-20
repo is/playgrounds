@@ -15,7 +15,7 @@ class TransmissionClient (cf:Config) {
       req
   }
 
-  lazy val sessionId = {
+  def sessionId = {
     val s = http.x(req >:> identity)
     s.get("X-Transmission-Session-Id").get.head
   }
@@ -29,7 +29,7 @@ class TransmissionClient (cf:Config) {
 
     val reqJson = compact(render(json))
 
-    println("send:" + reqJson)
+    // println("send:" + reqJson)
 
     val res = http (req
         <:< Map("X-Transmission-Session-Id" -> sessionId)
