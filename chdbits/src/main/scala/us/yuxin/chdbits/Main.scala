@@ -24,11 +24,14 @@ object Main {
         val path = config.getString("download.path") + "/" + i.torrentFilename;
         if (!new File(path).exists()) {
           val torrent = feed.downloadTorrent(i.id)
+
+          if (i.seed < 5)
+            tc.addTorrent(i, torrent)
+
           println("save to: " + i.torrentFilename)
           val fos = new FileOutputStream(path)
           fos.write(torrent)
           fos.close()
-          tc.addTorrent(i, torrent)
         } else {
           println("skipped")
         }
