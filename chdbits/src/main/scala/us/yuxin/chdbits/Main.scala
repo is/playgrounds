@@ -12,7 +12,10 @@ object Main {
 
     val feed = new Feeder(config.getConfig("chdbits"))
 
-    val tc = new TransmissionClient(config.getConfig("transmission.ovh"))
+    val tc = new TransmissionClient(
+      config.getConfig("transmission").getConfig(
+        config.getString("transmission.default")))
+    
     feed.login()
     feed.torrentInfos().filter({ i=>
       (i.rate eq "free") && (!i.bookmarked)
