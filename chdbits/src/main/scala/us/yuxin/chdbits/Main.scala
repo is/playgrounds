@@ -2,6 +2,7 @@ package us.yuxin.chdbits
 
 import com.typesafe.config.ConfigFactory
 import java.io.{FileOutputStream, File}
+import net.liftweb.json._
 
 /**
  * @author ${user.name}
@@ -28,8 +29,17 @@ object Main {
         if (!new File(path).exists()) {
           val torrent = feed.downloadTorrent(i.id)
 
-          if (i.seed < 5 && i.seed >= 0)
-            tc.addTorrent(i, torrent)
+          if (i.seed < 5 && i.seed >= 0) {
+            val r = tc.addTorrent(i, torrent)
+            print(r)
+            val res = parse(r)
+
+            if ((res \\ "result").values.toString() == "success" && i.size < config.getDouble("autostart")) {
+              val id:Int =
+                (res \\ "arguments" \\ "torrent-added" \\ "id").asInstanceOf[JInt].values.toInt
+              print("torrent-started:" + tc.startTorrent(id))
+            }
+          }
 
           println("save to: " + i.torrentFilename)
           val fos = new FileOutputStream(path)

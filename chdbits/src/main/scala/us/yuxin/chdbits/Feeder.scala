@@ -121,6 +121,7 @@ class Feeder(username: String, password: String, depth: Int) {
     }
   }
 
+
   def torrentInfos(): List[ItemInfo] = {
     val res = new ListBuffer[ItemInfo]
     for (i <- List.range(0, depth)) {
@@ -148,5 +149,3 @@ class Feeder(username: String, password: String, depth: Int) {
     bs.toByteArray()
   }
 }
-
-

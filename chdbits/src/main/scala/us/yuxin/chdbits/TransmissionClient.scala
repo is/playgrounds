@@ -24,7 +24,7 @@ class TransmissionClient(cf: Config) {
   }
 
   // If Code == 409, Set X-Transmission-Session-Id and retry.
-  def httpX[T](x: Handler[T]): HttpPackage[T] = {
+  def httpx[T](x: Handler[T]): HttpPackage[T] = {
     val hand = x.copy(request = x.request <:< Map("X-Transmission-Session-Id" -> sessId))
 
     var is409: Boolean = false
@@ -45,13 +45,9 @@ class TransmissionClient(cf: Config) {
     if (!is409)
       r
     else
-      httpX(x)
+      httpx(x)
   }
 
-  //  def httpx[T](x:Handler[T]):HttpPackage[T] = {
-  //    val r = http.x(x)
-  //    if (http.code)
-  //  }
 
   def addTorrent(i: ItemInfo, torrent: Array[Byte]) = {
     val json =
@@ -61,13 +57,15 @@ class TransmissionClient(cf: Config) {
             ( "metainfo" -> new sun.misc.BASE64Encoder().encode(torrent).replace("\r", "").replace("\n", "") ) )
 
     val reqJson = compact(render(json))
+    httpx(req <<(reqJson, "application/json") as_str)
+  }
 
-    // println("send:" + reqJson)
-
-//    val res = http(req
-//      <:< Map("X-Transmission-Session-Id" -> sessionId)
-//      <<(reqJson, "application/json") as_str)
-    val res = httpX(req <<(reqJson, "application/json") as_str)
-    println(res)
+  def startTorrent(id:Int) = {
+    val json =
+      ("method" -> "torrent-start") ~
+      ("arguments" ->
+        ("ids" -> id))
+    val reqJson = compact(render(json))
+    httpx(req << (reqJson, "application/json") as_str)
   }
 }
