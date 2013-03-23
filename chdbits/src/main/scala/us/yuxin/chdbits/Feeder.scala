@@ -2,7 +2,7 @@ package us.yuxin.chdbits
 
 import java.net.URLEncoder
 
-import dispatch.classic.{Http, :/}
+import dispatch.classic.{Handler, Http, :/}
 import com.typesafe.config.Config
 import util.matching.Regex
 import collection.mutable.ListBuffer
@@ -15,6 +15,8 @@ class Feeder(username: String, password: String, depth: Int) {
     config.getString("username"),
     config.getString("password"),
     config.getInt("depth"))
+
+  private val httpRetry = 15
 
   private val formType = "application/x-www-form-urlencoded"
   private val loginForm = "username=" + urlEncode(username) + "&password=" + urlEncode(password)
@@ -43,8 +45,7 @@ class Feeder(username: String, password: String, depth: Int) {
   private val rNumber = """>(\d+)<""".r
   private val rDesc = """(.*?) <img class="pro_(.+?)"""".r
 
-  def urlEncode(s: String) = URLEncoder.encode(s, "utf8")
-
+  private def urlEncode(s: String) = URLEncoder.encode(s, "utf8")
 
   def gbSize(size: String, unit: String): Float = {
     size.toFloat * (unit match {
@@ -68,11 +69,21 @@ class Feeder(username: String, password: String, depth: Int) {
     }
   }
 
+  def httpx[T](handler:Handler[T]):T = httpx(handler, httpRetry)
+  def httpx[T](handler:Handler[T], retry:Int):T = {
+    http.x(handler.copy(
+    block = {(code, res, ent) =>
+      // println("code=" + code)
+      if (code == 510)
+        httpx(handler, retry - 1)
+      else
+        handler.block(code, res, ent)
+    }))
+  }
 
-  def login() = http(loginUrl <<(loginForm, formType) as_str)
+  def login() = httpx(loginUrl <<(loginForm, formType) as_str)
 
-
-  def torrents(id: Int) = http(torrentsUrl <<? Map("page" -> id.toString) as_str)
+  def torrents(id: Int) = httpx(torrentsUrl <<? Map("page" -> id.toString) as_str)
 
 
   def parseTorrentInfo(in: String): Option[ItemInfo] = rDetail.findFirstMatchIn(in) match {
@@ -124,15 +135,15 @@ class Feeder(username: String, password: String, depth: Int) {
     res.toList
   }
 
-  def downloadTorrent(id:String, fn:String) = {
-    val fos = new FileOutputStream(fn)
-    http(downloadUrl <<? Map("id"->id) >>> fos)
-    fos.close()
-  }
+//  def downloadTorrent(id:String, fn:String) = {
+//    val fos = new FileOutputStream(fn)
+//    httpx(downloadUrl <<? Map("id"->id) >>> fos)
+//    fos.close()
+//  }
 
   def downloadTorrent(id:String):Array[Byte] = {
     val bs = new ByteArrayOutputStream()
-    http(downloadUrl <<? Map("id"->id) >>> bs)
+    httpx(downloadUrl <<? Map("id"->id) >>> bs)
     bs.close()
     bs.toByteArray()
   }

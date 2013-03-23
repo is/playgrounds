@@ -21,14 +21,14 @@ object Main {
       (i.rate eq "free") && (!i.bookmarked)
     }).foreach {
       i =>
-        println("%s: [%s] %s - %.3f -- %s %d/%d/%d - %s".format(
+        println("%s: [%s] %s - %.3f -- %s %d/%d/%d".format(
           i.id, i.category, i.name, i.size, i.rate,
-          i.seed, i.leech, i.download, i.bookmarked))
+          i.seed, i.leech, i.download))
         val path = config.getString("download.path") + "/" + i.torrentFilename;
         if (!new File(path).exists()) {
           val torrent = feed.downloadTorrent(i.id)
 
-          if (i.seed < 5)
+          if (i.seed < 5 && i.seed >= 0)
             tc.addTorrent(i, torrent)
 
           println("save to: " + i.torrentFilename)
@@ -36,7 +36,7 @@ object Main {
           fos.write(torrent)
           fos.close()
         } else {
-          println("skipped")
+          // println("skipped")
         }
     }
   }
