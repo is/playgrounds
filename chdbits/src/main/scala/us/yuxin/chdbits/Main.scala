@@ -37,11 +37,11 @@ object Main {
             if ((res \\ "result").values.toString() == "success" && i.size < config.getDouble("autostart")) {
               val id:Int =
                 (res \\ "arguments" \\ "torrent-added" \\ "id").asInstanceOf[JInt].values.toInt
-              print("torrent-started:" + tc.startTorrent(id))
+              print("-- torrent-started:" + tc.startTorrent(id))
             }
           }
 
-          println("save to: " + i.torrentFilename)
+          println("-- save-to: " + i.torrentFilename)
           val fos = new FileOutputStream(path)
           fos.write(torrent)
           fos.close()

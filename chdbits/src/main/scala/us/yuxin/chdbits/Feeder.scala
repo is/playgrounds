@@ -74,7 +74,7 @@ class Feeder(username: String, password: String, depth: Int) {
     http.x(handler.copy(
     block = {(code, res, ent) =>
       // println("code=" + code)
-      if (code == 510)
+      if (code >= 500)
         httpx(handler, retry - 1)
       else
         handler.block(code, res, ent)
