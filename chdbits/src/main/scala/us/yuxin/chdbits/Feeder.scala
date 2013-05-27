@@ -30,20 +30,36 @@ class Feeder(username: String, password: String, depth: Int) {
 
 
   private val rBig = """(?s)<tr.{1,26}<td class="rowfollow nowrap" valign="middle" style='padding: 0px'>.+?</table>.+?</tr>""".r
-  private val rDetail = new Regex(
+//  private val rDetail = new Regex(
+//    """(?m)(?s)img class="c_(.+?)"""" + //category
+//    """ src=.+?addsprites.gif\);" alt="(.+?)"""" + //encode
+//    """.+? href="details.php\?id=(\d+)&amp;hit=1" ><b>""" + // id
+//    """(.+?)</b></a><br />(.+?)</td>""" + //name & desc
+//    """.+?alt="(Unbookmarked|Bookmarked)"""" + // bookmarked
+//    """.+?</span></td><td class="rowfollow">(.+?)<br />(.+?)</td>""" + // size & unit
+//    """<td class="rowfollow" align="center">(.+?)</td>""" +
+//    """.+?<td class="rowfollow">(.+?)</td>""" +
+//    """.+?<td class="rowfollow">(.+?)</td>""" +
+//    """.+?<td class="rowfollow">(.+?)</td>""",
+//    "category", "encode", "id", "name", "desc", "bookmarked", "size", "unit", "seeds", "leechs", "downloads", "publisher")
+
+  val rDetail = new Regex(
     """(?m)(?s)img class="c_(.+?)"""" + //category
-    """ src=.+?addsprites.gif\);" alt="(.+?)"""" + //encode
-    """.+? href="details.php\?id=(\d+)&amp;hit=1" ><b>""" + // id
-    """(.+?)</b></a><br />(.+?)</td>""" + //name & desc
-    """.+?alt="(Unbookmarked|Bookmarked)"""" + // bookmarked
-    """.+?</span></td><td class="rowfollow">(.+?)<br />(.+?)</td>""" + // size & unit
-    """<td class="rowfollow" align="center">(.+?)</td>""" +
-    """.+?<td class="rowfollow">(.+?)</td>""" +
-    """.+?<td class="rowfollow">(.+?)</td>""" +
-    """.+?<td class="rowfollow">(.+?)</td>""",
-    "category", "encode", "id", "name", "desc", "bookmarked", "size", "unit", "seeds", "leechs", "downloads", "publisher")
+      """ src=.+?addsprites.gif\);" alt="(.+?)"""" + //encode
+      """.+? href="details.php\?id=(\d+)&amp;hit=1" ><b>""" + // id
+      """(.+?)</b></a>(.*?)<br />(.+?)</td>""" + //name & free & desc
+      """.+?alt="(Unbookmarked|Bookmarked)"""" + // bookmarked
+      """.+?</span></td><td class="rowfollow">(.+?)<br />(.+?)</td>""" + // size & unit
+      """<td class="rowfollow" align="center">(.+?)</td>""" +
+      """.+?<td class="rowfollow">(.+?)</td>""" +
+      """.+?<td class="rowfollow">(.+?)</td>""" +
+      """.+?<td class="rowfollow">(.+?)</td>""",
+    "category", "encode", "id", "name", "rate", "desc", "bookmarked", "size", "unit", "seeds", "leechs", "downloads", "publisher")
+
+
   private val rNumber = """>(\d+)<""".r
   private val rDesc = """(.*?) <img class="pro_(.+?)"""".r
+  private val rFree = """<img class="pro_(.+?)"""".r
 
   private def urlEncode(s: String) = URLEncoder.encode(s, "utf8")
 
@@ -90,18 +106,18 @@ class Feeder(username: String, password: String, depth: Int) {
     case None => None
     case Some(m) => {
       val (desc, rate) = {
-        val d = m.group("desc")
+        val d = m.group("rate")
 
         if (d.indexOf("<img") == -1)
           (d, "100")
         else {
-          val cdm = rDesc.findFirstMatchIn(d)
+          val cdm = rFree.findFirstMatchIn(d)
           if (cdm == None) {
             println(d)
           }
           val dm = cdm.get
           val rMap = Map("50pctdown" -> "50", "free" -> "free")
-          (dm.group(1), rMap.getOrElse(dm.group(2), dm.group(2)))
+          (m.group("desc"), rMap.getOrElse(dm.group(1), dm.group(1)))
         }
       }
 
