@@ -19,6 +19,7 @@
   ;  "central" {:name "is-release" :url "http://scm4i:8081/artifactory/is-release" :username "is" :password :env}
   ;  "clojars" {:name "is-release" :url "http://scm4i:8081/artifactory/is-release" :username "is" :password :env}
   ; }
+  :aot [chdbits2.core]
   :plugin-repositories [["plugins-release" "http://scm4i:8081/artifactory/plugins-release"]]
   :local-repo "local-m2"
   :javac-options ["-target" "1.7" "-source" "1.7" "-Xlint:-options"]

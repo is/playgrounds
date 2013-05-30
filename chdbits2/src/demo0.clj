@@ -1,9 +1,7 @@
 (ns demo0
-  (:require [chdbits2.main])
+  (:require [chdbits2.core :as core])
   )
 
 (defn -main
   []
-  (chdbits2.main/main "hello"))
-
-
+  (core/main "hello"))
