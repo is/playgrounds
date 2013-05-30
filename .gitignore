@@ -1,1 +1,8 @@
 .idea
+*.ipr
+*.iml
+*.iws
+chdbits2/target
+chdbits2/local-m2
+chdbits2/pom.xml
+
