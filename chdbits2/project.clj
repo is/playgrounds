@@ -3,6 +3,7 @@
   :url "https://github.com/is/demos/tree/master/chdbits2"
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [clj-http "0.7.2"]
+                 [crouton "0.1.1"]
                  [com.typesafe/config "1.0.0"]]
   :plugins [[lein-pprint "1.1.1"]
     [lein-idea "1.0.1"]]
