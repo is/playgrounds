@@ -8,6 +8,9 @@ import util.matching.Regex
 import collection.mutable.ListBuffer
 import java.io.{ByteArrayOutputStream, FileOutputStream}
 
+import org.jsoup.Jsoup
+
+
 class Feeder(username: String, password: String, depth: Int) {
   def this(username: String, password: String) = this(username, password, 5)
 
@@ -141,13 +144,19 @@ class Feeder(username: String, password: String, depth: Int) {
   def torrentInfos(): List[ItemInfo] = {
     val res = new ListBuffer[ItemInfo]
     for (i <- List.range(0, depth)) {
-      rBig.findAllIn(torrents(i)).foreach {
+      val html = torrents(i)
+
+      rBig.findAllIn(html).foreach {
         block =>
           val item = parseTorrentInfo(block)
           if (item.isDefined) {
             res += item.get
           }
       }
+
+      val page =  Jsoup.parse(html)
+      println ("---JSOUP---")
+      println (page.select("table.torrents#torrenttable tr.rowsticky").size())
     }
     res.toList
   }
