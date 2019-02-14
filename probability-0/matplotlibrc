@@ -207,6 +207,10 @@ boxplot.meanprops.linewidth       : 1.0
 #font.cursive        : Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, cursive
 #font.fantasy        : Comic Sans MS, Chicago, Charcoal, ImpactWestern, Humor Sans, xkcd, fantasy
 #font.monospace      : DejaVu Sans Mono, Bitstream Vera Sans Mono, Computer Modern Typewriter, Andale Mono, Nimbus Mono L, Courier New, Courier, Fixed, Terminal, monospace
+font.serif          : Ubuntu Condensed
+font.sans-serif     : Ubuntu Condensed
+font.cursive        : Ubuntu Condensed
+font.monospace      : Input Mono Thin
 
 #### TEXT
 ## text properties used by text.Text.  See
