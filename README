@@ -13,4 +13,5 @@ This repository is my demo project container.
   go-ch0 - channel in golang. 2019.01
   js-await-and-async - es6 await/async. 2019.01
 
-  python-c-module - simplest C module for pytho. 2019.02
+  python-c-module - simplest C module for python. 2019.02
+  python-aio-0 - async io demo for python 3.7. 2019.02
