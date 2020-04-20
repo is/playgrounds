@@ -52,6 +52,7 @@ def project_infos_to_text(infos):
     curdate = info['date']
     print(info)
     res.append("  - {name}: {desc} - {date}".format(**info))
+  print(res)
   return "\n".join(res)
 
 
