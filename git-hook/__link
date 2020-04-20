@@ -1,4 +1,4 @@
 #!/bin/sh
 
-cd $HOME/src/x/.git/hooks
+cd $HOME/src/playgrounds/.git/hooks
 ln -snf ../../_/git-hook/commit-msg-hook.py commit-msg
