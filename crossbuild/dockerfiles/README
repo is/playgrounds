@@ -2,4 +2,10 @@
 docker build --rm --net=host \
   --force-rm -f ubuntu-crossbuild \
   --tag ubuntu-crossbuild:20.04 .
+
+docker run -d --net=host \
+  --name=farm0 \
+  -v /tmp:/tmp \
+  -v /home/admin:/home/admin \
+  ubuntu-crossbuild:20.04 /bin/sleep 99999999999
 ```

@@ -3,19 +3,21 @@ LABEL maintainer="Yu Xin, scaner@gmail.com"
 
 RUN \
     echo "\
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse\n\
-deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse\n\
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse\n\
-deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse\n\
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse\n\
-deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse\n\
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse\n\
-deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse\n\
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse\n\
+deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal main restricted universe multiverse\n\
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse\n\
+deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-updates main restricted universe multiverse\n\
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse\n\
+deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-backports main restricted universe multiverse\n\
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse\n\
+deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ focal-security main restricted universe multiverse\n\
 " > /etc/apt/sources.list \
-&& apt-get update -y -q && apt-get upgrade -y -q \
-&& apt-get install -y apt-utils \
-&& DEBIAN_FRONTEND="noninteractive" apt-get install -y -q git build-essential bison flex vim tmux screen sudo \
+&& apt-get update -y -q -o Acquire::https::mirrors.tuna.tsinghua.edu.cn::Verify-Peer=false \
+&& apt-get upgrade -y -q -o Acquire::https::mirrors.tuna.tsinghua.edu.cn::Verify-Peer=false \
+&& apt-get install -y -o Acquire::https::mirrors.tuna.tsinghua.edu.cn::Verify-Peer=false apt-utils ca-certificates \
+&& DEBIAN_FRONTEND="noninteractive" apt-get install -y -q git build-essential bc bison flex vim tmux screen sudo \
    crossbuild-essential-armhf crossbuild-essential-arm64 crossbuild-essential-i386 \
+   qemu-efi qemu-system qemu-system-arm \
 && groupadd -g 500 admin && useradd -g 500 -u 500 -M -s /bin/bash admin \
 && echo "%admin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/admin
 
