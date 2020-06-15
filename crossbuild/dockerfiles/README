@@ -1,0 +1,5 @@
+```
+docker build --rm --net=host \
+  --force-rm -f ubuntu-crossbuild \
+  --tag ubuntu-crossbuild:20.04 .
+```
