@@ -70,6 +70,7 @@ def main():
     profile = None
     profile_fn = FFMPEG_PROFILE
     profiles = read_profiles_from_file(profile_fn)
+    run_script = True
     source_dir = "."
     
     for arg in sys.argv:
@@ -79,8 +80,13 @@ def main():
             continue
         if arg in profiles:
             profile = arg
+            continue
         if os.path.isdir(arg):
             source_dir = arg
+            continue
+        if arg == 'dry':
+            run_script = False
+            continue
 
     name, fns = find_input(source_dir)
     if profile == None:
@@ -96,6 +102,7 @@ def main():
     cmds.append(f"export I={I}")
     cmds.append(f"export O={O}")
     cmds.append(f"mkdir -p {D}")
+    cmds.append(f'if [ "$TMUX" != "" ] ; then tmux renamew {name} ; fi')
     cmds.append("ffmpeg -hide_banner -y \\")
     cmds.append(" -i $I \\")
     cmds.append(" " + " \\\n ".join(profiles[profile][1]) + " \\")
@@ -110,6 +117,9 @@ def main():
     fout.close()
     os.chmod(script_path, 0o500)
     print(script_path)
+
+    if run_script:
+        os.execl(script_path, script_path)
 
 if __name__ == '__main__':
     main()
