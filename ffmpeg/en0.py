@@ -63,9 +63,9 @@ def find_input(dir):
     return name, fns
 
 def main():
-    print(EXEC_PATH)
-    print(EXEC_DIR)
-    print(FFMPEG_PROFILE)
+    #print(EXEC_PATH)
+    #print(EXEC_DIR)
+    #print(FFMPEG_PROFILE)
     
     profile = None
     profile_fn = FFMPEG_PROFILE
@@ -87,7 +87,7 @@ def main():
         print('PROFILES: {}'.format(",".join(profiles.keys())))
         if name != None and len(fns) != 0:
             print("INPUTS: {}".format(",".join(fns)))
-        exit
+        sys.exit(0)
 
     I = fns[0]
     O = P(OUT_DIR, name, name + '__' + profiles[profile][0] + ".mp4")
@@ -97,9 +97,19 @@ def main():
     cmds.append(f"export O={O}")
     cmds.append(f"mkdir -p {D}")
     cmds.append("ffmpeg -hide_banner -y \\")
+    cmds.append(" -i $I \\")
     cmds.append(" " + " \\\n ".join(profiles[profile][1]) + " \\")
-    cmds.append(" -i $I $O")
+    cmds.append(" $O")
+
+
     print("\n".join(cmds))
+    print("\n----")
+    script_path = P(OUT_DIR, "__" + name)
+    fout = open(script_path, "w")
+    fout.write("\n".join(cmds))
+    fout.close()
+    os.chmod(script_path, 0o500)
+    print(script_path)
 
 if __name__ == '__main__':
     main()
