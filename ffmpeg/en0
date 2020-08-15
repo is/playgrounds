@@ -1,0 +1,4 @@
+#!/bin/sh
+
+source __conda
+python $HOME/src/p/ffmpeg/en0.py "$@"
