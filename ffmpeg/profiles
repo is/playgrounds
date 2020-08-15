@@ -7,7 +7,7 @@ ffmpeg -hide_banner -y \
  -c:a aac -b:a 128k
 
 
-# --- profile 264v1 x264,cr23,slow,anime,1m
+# --- profile 264v0 x264,cr23,slow,anime,1m
 ffmpeg -hide_banner -y
  -c:v libx264 -crf 23 \
  -preset slow -tune animation \

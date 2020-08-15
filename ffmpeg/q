@@ -1,0 +1,28 @@
+#!/bin/sh
+
+PROFILE=265v0
+DIR=NONE
+
+if [ $# == 1 ] ; then
+DIR=$1
+fi
+
+if [ $# == 2 ] ; then
+PROFILE=$1
+DIR=$2
+fi
+
+if [ $DIR == NONE ] ; then
+exit 0
+fi
+
+NAME=$(basename $DIR)
+S0=$HOME/.enc0/queue/XX__$NAME
+S1=$HOME/.enc0/queue/__$NAME
+
+echo "#!/bin/sh" > $S0
+echo "exec $HOME/bin/en0 $PROFILE $DIR" >> $S0
+mv $S0 $S1
+
+
+
