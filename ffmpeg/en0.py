@@ -91,7 +91,7 @@ def main():
 
     name, fns = find_input(source_dir)
     if profile == None:
-        print('PROFILES: {}'.format(",".join(profiles.keys())))
+        print('PROFILES:\n {}'.format("\n ".join(profiles.keys())))
         if name != None and len(fns) != 0:
             print("INPUTS: {}".format(",".join(fns)))
         sys.exit(0)
@@ -104,7 +104,7 @@ def main():
     cmds.append(f"export O={O}")
     cmds.append(f"mkdir -p {D}")
     cmds.append(f'if [ "$TMUX" != "" ] ; then tmux renamew {name} ; fi')
-    cmds.append("ffmpeg -hide_banner -y \\")
+    cmds.append("exec ffmpeg -hide_banner -y \\")
     cmds.append(" -i $I \\")
     cmds.append(" " + " \\\n ".join(profiles[profile][1]) + " \\")
     cmds.append(" $O")
