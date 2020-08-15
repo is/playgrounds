@@ -42,6 +42,7 @@ def read_profiles_from_file(fn):
             if len(line) != 0:
                 opts.append(line)
             profiles[name] = [desc, opts]
+            state = 0
     fin.close()
     return profiles
 

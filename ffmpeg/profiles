@@ -1,4 +1,4 @@
-# --- profile 265.0 x265,cr28,960x540
+# --- profile 265v0 x265,cr28,960x540
 ffmpeg -hide_banner -y \
  -c:v libx265 \
  -vf scale=-1:540 \
@@ -7,7 +7,7 @@ ffmpeg -hide_banner -y \
  -c:a aac -b:a 128k
 
 
-# -- profile 264v1 x264,cr23
+# --- profile 264v1 x264,cr23,slow,anime,1m
 ffmpeg -hide_banner -y
  -c:v libx264 -crf 23 \
  -preset slow -tune animation \
