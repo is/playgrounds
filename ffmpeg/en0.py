@@ -9,7 +9,7 @@ P = path.join
 OUT_DIR = P(os.environ.get("HOME"), ".enc0")
 EXEC_PATH = P(path.abspath(sys.argv[0]))
 EXEC_DIR = P(path.dirname(EXEC_PATH))
-FFMPEG_PROFILE = P(EXEC_DIR, "profile")
+FFMPEG_PROFILE = P(EXEC_DIR, "profiles")
 
 PROFILE_HEAD_TAG = '# --- profile'
 

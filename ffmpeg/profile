@@ -1,7 +1,0 @@
-# --- profile p0 x265,cr28,960x540
-ffmpeg -hide_banner -y \
- -c:v libx265 \
- -vf scale=-1:540 \
- -crf 28 -preset slow  -tune ssim \
- -profile:v main \
- -c:a aac -b:a 128k
