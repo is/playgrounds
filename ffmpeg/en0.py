@@ -85,8 +85,9 @@ def main():
     name, fns = find_input(source_dir)
     if profile == None:
         print('PROFILES: {}'.format(",".join(profiles.keys())))
-        if name != None:
+        if name != None and len(fns) != 0:
             print("INPUTS: {}".format(",".join(fns)))
+        exit
 
     I = fns[0]
     O = P(OUT_DIR, name, name + '__' + profiles[profile][0] + ".mp4")
