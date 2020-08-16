@@ -18,10 +18,10 @@ def find_running_ffmpeg():
     for pid in pids:
         try:
             P = psutil.Process(pid)
+            if (P.name().find("ffmpeg") >= 0):
+                R.append(P)
         except psutil.NoSuchProcess:
             continue
-        if (P.name().find("ffmpeg") >= 0):
-            R.append(P)
     return R
 
 def tip():

@@ -97,32 +97,36 @@ def main():
         sys.exit(0)
 
     I = fns[0]
-    O = P(OUT_DIR, name + ".do", name + '__' + profiles[profile][0] + ".mp4")
-    D = path.dirname(O)
-    D2 = D[:-3]
+    D0 = P(OUT_DIR, name)
+    D1 = D0 + ".do"
+    D2 = D0 + ".done"
+    S1 = P(OUT_DIR, "do", "__" + name)
+    S2 = P(OUT_DIR, "done", "__" + name)
+
+    O = P(D1, name + '__' + profiles[profile][0] + ".mp4")
+
     cmds = ["#!/bin/sh", "# --"]
     cmds.append(f"export I={I}")
     cmds.append(f"export O={O}")
-    cmds.append(f"mkdir -p {D}")
+    cmds.append(f"mkdir -p {D1}")
     cmds.append(f'if [ "$TMUX" != "" ] ; then tmux renamew {name} ; fi')
     cmds.append("ffmpeg -hide_banner -y \\")
     cmds.append(" -i $I \\")
     cmds.append(" " + " \\\n ".join(profiles[profile][1]) + " \\")
     cmds.append(" $O")
-    cmds.append(f"\n\nmv {D} {D2}")
-
+    cmds.append(f"\n\nmv {D1} {D2}")
+    cmds.append(f"mv {S1} {S2}")
 
     print("\n".join(cmds))
     print("\n----")
-    script_path = P(OUT_DIR, "__" + name)
-    fout = open(script_path, "w")
+    fout = open(S1, "w")
     fout.write("\n".join(cmds))
     fout.close()
-    os.chmod(script_path, 0o500)
-    print(script_path)
+    os.chmod(S1, 0o500)
+    print(S1)
 
     if run_script:
-        os.execl(script_path, script_path)
+        os.execl(S1, S1)
 
 if __name__ == '__main__':
     main()
