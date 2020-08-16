@@ -75,6 +75,9 @@ def main():
     source_dir = "."
     
     for arg in sys.argv:
+        if arg == 'dry':
+            run_script = False
+            continue
         if (arg.endswith(".profile")):
             profile_fn = arg
             profiles = read_profiles_from_file(profile_fn)
@@ -85,9 +88,6 @@ def main():
         if os.path.isdir(arg):
             source_dir = arg
             continue
-        if arg == 'dry':
-            run_script = False
-            continue
 
     name, fns = find_input(source_dir)
     if profile == None:
@@ -97,17 +97,19 @@ def main():
         sys.exit(0)
 
     I = fns[0]
-    O = P(OUT_DIR, name, name + '__' + profiles[profile][0] + ".mp4")
+    O = P(OUT_DIR, name + ".do", name + '__' + profiles[profile][0] + ".mp4")
     D = path.dirname(O)
+    D2 = D[:-3]
     cmds = ["#!/bin/sh", "# --"]
     cmds.append(f"export I={I}")
     cmds.append(f"export O={O}")
     cmds.append(f"mkdir -p {D}")
     cmds.append(f'if [ "$TMUX" != "" ] ; then tmux renamew {name} ; fi')
-    cmds.append("exec ffmpeg -hide_banner -y \\")
+    cmds.append("ffmpeg -hide_banner -y \\")
     cmds.append(" -i $I \\")
     cmds.append(" " + " \\\n ".join(profiles[profile][1]) + " \\")
     cmds.append(" $O")
+    cmds.append(f"\n\nmv {D} {D2}")
 
 
     print("\n".join(cmds))
