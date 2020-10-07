@@ -114,7 +114,7 @@ def main():
     cmds.append(" -i $I \\")
     cmds.append(" " + " \\\n ".join(profiles[profile][1]) + " \\")
     cmds.append(" $O")
-    cmds.append(f"\n\nmv {D1} {D2}")
+    cmds.append(f"\n\nmv {D1} {D0}")
     cmds.append(f"mv {S1} {S2}")
 
     print("\n".join(cmds))
