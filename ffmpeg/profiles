@@ -13,6 +13,22 @@ ffmpeg -hide_banner -y \
  -profile:v main \
  -c:a aac -b:a 128k
 
+# --- profile 265v2 x265,cr28,origin
+ffmpeg -hide_banner -y \
+ -c:v libx265 \
+ -crf 28 -preset medium -tune ssim \
+ -profile:v main \
+ -c:a aac -b:a 128k
+
+
+# --- profile hevc x265,cr28,origin
+ffmpeg -hide_banner -y \
+ -c:v libx265 \
+ -crf 28 -preset medium -tune ssim \
+ -profile:v main \
+ -c:a aac -b:a 128k \
+ -tag:v hvc1
+
 
 
 # --- profile 264v0 x264,cr23,slow,anime,1m
