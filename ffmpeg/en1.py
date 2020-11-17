@@ -61,6 +61,7 @@ def find_input(dir):
     for ext in "wmv,mp4,mkv,avi".split(","):
         fns.extend(glob.glob(base + "/*." + ext))
     fns = [ fn for fn in fns if os.path.getsize(fn) > 400000000 ]
+    fns.sort()
     name = path.basename(base)
     return name, fns
 
@@ -98,7 +99,7 @@ def main():
         sys.exit(0)
 
     #I = fns[0]
-    I = "".join(["""-i "%s" """ % x for x in fns])
+    #I = "".join(["""-i "%s" """ % x for x in fns])
     D0 = P(OUT_DIR, name)
     D1 = D0 + ".do"
     D2 = D0 + ".done"
@@ -110,12 +111,31 @@ def main():
     cmds = ["#!/bin/sh", "# --"]
     cmds.append(f"mkdir -p {D1}")
     cmds.append(f'if [ "$TMUX" != "" ] ; then tmux renamew {name} ; fi')
-    cmds.append("ffmpeg -hide_banner -y \\")
-    cmds.append(f" {I}\\")
-    cmds.append(" " + " \\\n ".join(profiles[profile][1]) + " \\")
-    cmds.append(f" {O}")
+
+    
+    if len(fns) == 1:
+        I = "-i {}".format(fns[0])
+        O = P(D1, name + '__' + profiles[profile][0] + ".mp4")
+        cmds.append("ffmpeg -hide_banner -y \\")
+        cmds.append(f" {I}\\")
+        cmds.append(" " + " \\\n ".join(profiles[profile][1]) + " \\")
+        cmds.append(f" {O}")
+        cmds.append("")
+    else:
+        for i in range(len(fns)):
+            I = "-i {}".format(fns[i])
+            O = P(D1, name + '_' + str(i + 1) + '__' + profiles[profile][0] + ".mp4")
+            cmds.append("ffmpeg -hide_banner -y \\")
+            cmds.append(f" {I}\\")
+            cmds.append(" " + " \\\n ".join(profiles[profile][1]) + " \\")
+            cmds.append(f" {O}")
+            cmds.append("")
+           
+
+
     cmds.append(f"\n\nmv {D1} {D0}")
     cmds.append(f"mv {S1} {S2}")
+    cmds.append("")
 
     print("\n".join(cmds))
     print("\n----")
