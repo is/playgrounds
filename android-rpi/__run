@@ -1,0 +1,8 @@
+#!/bin/sh
+
+docker run -d --net=host \
+  --name a0 \
+  -v /home/admin:/home/admin \
+  -v /root:/root \
+  -v /tmp:/tmp ubuntu:20.04 \
+  sleep 10000200401

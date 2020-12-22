@@ -1,0 +1,11 @@
+https://github.com/android-rpi/local_manifests/tree/arpi-11
+
+#
+apt install -y git openssh-client
+apt install -y build-essential android-sdk-build-tools crossbuild-essential-arm64
+
+apt install -y python python3
+apt install -y curl wget
+
+apt install -y flex bison bc libssl-dev libncurses5
+apt install -y unzip zip
