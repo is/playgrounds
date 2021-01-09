@@ -73,6 +73,8 @@ class Github(object):
             self.site = 'github.com'
             self.group = m[1]
             self.repo = m[2]
+            if self.repo.endswith('.git'):
+                self.repo = self.repo[:-4]
             return
 
 
