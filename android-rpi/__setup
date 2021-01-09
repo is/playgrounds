@@ -1,0 +1,11 @@
+#!/bin/sh
+
+CNAME=a0
+
+docker cp sources.list $CNAME:/etc/apt
+
+docker exec -it $CNAME groupadd -g 500 admin
+docker exec -it $CNAME useradd -g 500 -u 500 -d /home/admin admin
+
+docker cp __install_package $CNAME:/tmp
+docker exec $CNAME /tmp/__install_package

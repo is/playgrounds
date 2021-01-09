@@ -1,0 +1,16 @@
+#!/bin/sh
+
+apt update
+apt upgrade -y
+
+
+apt install -y tmux sudo
+apt install -y git openssh-client
+apt install -y build-essential android-sdk-build-tools crossbuild-essential-arm64
+
+apt install -y python python3 python3-pip
+apt install -y curl wget
+
+apt install -y flex bison bc libssl-dev libncurses5 libx11-dev
+apt install -y unzip zip
+
