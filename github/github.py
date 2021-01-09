@@ -2,7 +2,6 @@ import sys
 import os
 import re
 
-
 from typing import List
 
 class Github(object):
@@ -19,6 +18,7 @@ class Github(object):
         self.protocol:str = 'ssh'
 
         self.dst_path:str = None
+        self.dry_run:bool = False
 
 
     def command(self) -> bool:
@@ -57,6 +57,12 @@ class Github(object):
         print("github [options] src [dst] [ -- {git options}]")
 
 
+    def run_cmd(self, cmd:str) -> None:
+        if self.dry_run == True:
+            return
+        os.system(cmd)
+
+
     def parse_source(self) -> None:
         src_raw = self.src_raw
 
@@ -91,6 +97,8 @@ class Github(object):
             print(f'''DEST: {self.dst_path}''')
             print(f'''CMD: {cmd}''')
 
+        if cmd != None:
+            self.run_cmd(cmd)
 
     def run(self) -> None:
         if not self.command():
