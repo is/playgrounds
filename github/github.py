@@ -69,6 +69,15 @@ class Github(object):
     def parse_source(self) -> None:
         src_raw = self.src_raw
 
+        # https://github.com/is/playgrounds/commit/a93aa0648ea7af9534b3934296d3e5c3e2a01cf0
+        r = re.compile(r'''https://github.com/(.+?)/(.+?)/''')
+        m = r.match(src_raw)
+        if m != None:
+            self.site = 'github.com'
+            self.group = m[1]
+            self.repo = m[2]
+            return
+
         ## https://github.com/microsoft/vscode
         r0 = re.compile(r'''https://github.com/(.+?)/(.+?)$''')
         m = r0.match(src_raw)
@@ -98,6 +107,7 @@ class Github(object):
             if self.repo.endswith('.git'):
                 self.repo = self.repo[:-4]
             return
+
 
 
     def clone(self) -> None:
