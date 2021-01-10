@@ -35,6 +35,9 @@ class Github(object):
 
             if arg.startswith('-') or arg.startswith('+'):
                 arg_opt = arg[1:]
+                if arg_opt == 'dry':
+                    self.dry_run = True
+                    continue
                 print(arg_opt)
                 continue
 
@@ -67,7 +70,7 @@ class Github(object):
         src_raw = self.src_raw
 
         ## https://github.com/microsoft/vscode
-        r0 = re.compile(r'''https://.+?/(.+?)/(.+?)$''')
+        r0 = re.compile(r'''https://github.com/(.+?)/(.+?)$''')
         m = r0.match(src_raw)
         if m != None:
             self.site = 'github.com'
@@ -81,8 +84,19 @@ class Github(object):
         m = r1.match(src_raw)
         if m != None:
             self.site = 'github.com'
-            self.group = m[0]
+            self.group = m[1]
             self.repo = m[2]
+            return
+
+        # http://gitlab.alibaba-inc.com/spl/tisplus_spl_dmp_search4tag
+        r2 = re.compile(r'''http://(.+?)/(.+?)/(.+?)$''')
+        m = r2.match(src_raw)
+        if m != None:
+            self.site = m[1]
+            self.group = m[2]
+            self.repo = m[3]
+            if self.repo.endswith('.git'):
+                self.repo = self.repo[:-4]
             return
 
 
@@ -102,7 +116,12 @@ class Github(object):
 
         cmd = f'''git clone {git_opts}{self.src} {self.dst_path}'''
         if self.site == 'github.com':
-            print(f'''== GITHUB == ''')
+            print(f'''== GITHUB ==''')
+            print(f'''SRC: {self.src}''')
+            print(f'''DEST: {self.dst_path}''')
+            print(f'''CMD: {cmd}''')
+        else:
+            print(f'''== {self.site} ==''')
             print(f'''SRC: {self.src}''')
             print(f'''DEST: {self.dst_path}''')
             print(f'''CMD: {cmd}''')
@@ -129,3 +148,5 @@ class Github(object):
 
 if __name__ == '__main__':
     Github(sys.argv).run()
+
+# vim: ts=4 sts=4 sw=4 expandtab ai
