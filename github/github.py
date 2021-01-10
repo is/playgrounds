@@ -68,13 +68,21 @@ class Github(object):
 
         ## https://github.com/microsoft/vscode
         r0 = re.compile(r'''https://.+?/(.+?)/(.+?)$''')
-        m = r0.match( src_raw)
+        m = r0.match(src_raw)
         if m != None:
             self.site = 'github.com'
             self.group = m[1]
             self.repo = m[2]
             if self.repo.endswith('.git'):
                 self.repo = self.repo[:-4]
+            return
+
+        r1 = re.compile(r'''git@github.com:(.+?)/(.+?).git''')
+        m = r1.match(src_raw)
+        if m != None:
+            self.site = 'github.com'
+            self.group = m[0]
+            self.repo = m[2]
             return
 
 
