@@ -89,8 +89,8 @@ class Github(object):
                 self.repo = self.repo[:-4]
             return
 
-        r1 = re.compile(r'''git@github.com:(.+?)/(.+?).git''')
-        m = r1.match(src_raw)
+        r = re.compile(r'''git@github.com:(.+?)/(.+?).git''')
+        m = r.match(src_raw)
         if m != None:
             self.site = 'github.com'
             self.group = m[1]
@@ -98,8 +98,8 @@ class Github(object):
             return
 
         # http://gitlab.alibaba-inc.com/spl/tisplus_spl_dmp_search4tag
-        r2 = re.compile(r'''http://(.+?)/(.+?)/(.+?)$''')
-        m = r2.match(src_raw)
+        r = re.compile(r'''http://(.+?)/(.+?)/(.+?)$''')
+        m = r.match(src_raw)
         if m != None:
             self.site = m[1]
             self.group = m[2]
@@ -108,12 +108,21 @@ class Github(object):
                 self.repo = self.repo[:-4]
             return
 
+        # git@gitlab.com:e89/fg33.git
+        r = re.compile(r'''git@(.+?):(.+?)/(.+?).git$''')
+        m = r.match(src_raw)
+        if m != None:
+            self.site = m[1]
+            self.group = m[2]
+            self.repo = m[3]
+            return
 
 
     def clone(self) -> None:
         base_path = os.path.dirname(self.dst_path)
         try:
-            os.makedirs(base_path)
+           if base_path != '.' and base_path != '':
+                os.makedirs(base_path)
         except FileExistsError:
             pass
 
@@ -151,6 +160,8 @@ class Github(object):
         if self.dst_raw == None:
             self.dst_path = os.path.join(
                 os.environ['HOME'], 'src', self.site, self.group, self.repo)
+        elif self.dst_raw == '.':
+            self.dst_path = self.repo
         else:
             self.dst_path = self.dst_raw
         self.clone()
