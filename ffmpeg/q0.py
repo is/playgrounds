@@ -10,7 +10,7 @@ RUN_DIR = os.path.join(os.environ['HOME'], '.enc0/run')
 
 INTERVAL = 5
 TMUX = 'f2'
-PARALLEL = 2
+PARALLEL = 1
 
 def find_running_ffmpeg():
     R = []

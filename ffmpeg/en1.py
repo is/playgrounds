@@ -124,7 +124,7 @@ def main():
     else:
         for i in range(len(fns)):
             I = "-i {}".format(fns[i])
-            O = P(D1, name + '_' + str(i + 1) + '__' + profiles[profile][0] + ".mp4")
+            O = P(D1, name + '-' + str(i + 1) + '__' + profiles[profile][0] + ".mp4")
             cmds.append("ffmpeg -hide_banner -y \\")
             cmds.append(f" {I}\\")
             cmds.append(" " + " \\\n ".join(profiles[profile][1]) + " \\")
