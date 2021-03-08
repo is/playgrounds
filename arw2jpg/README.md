@@ -19,3 +19,6 @@ http://www.rawdigger.com/data/SonyStarTrails/_DSC0035-startrails.ARW
 ```
 https://blog.csdn.net/dcrmg/article/details/105124898
 ```
+
+# Note
+白平衡有点问题，需要调整.
