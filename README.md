@@ -3,6 +3,9 @@
 ```
   ///// LIVE PROJECT /////
 
+  - cv-1: opencv测试代码 - 2021.03
+
+  - opencv: opencv教程代码 - 2021.02
   - arw2jpg: Sony ARW转jpg. - 2021.02
 
   - quant-0: quant sample code. - 2021.01
@@ -25,14 +28,16 @@
 ```
 
 # LINKS
+[`cv-1.115`](http://github.com/is/playgrounds/tree/master/cv-1), 
+[`opencv.115`](http://github.com/is/playgrounds/tree/master/opencv), 
 [`arw2jpg.114`](http://github.com/is/playgrounds/tree/master/arw2jpg), 
 [`quant-0.113`](http://github.com/is/playgrounds/tree/master/quant-0), 
 [`mirrors.112`](http://github.com/is/playgrounds/tree/master/mirrors), 
 [`github.111`](http://github.com/is/playgrounds/tree/master/github), 
 [`android-rpi.110`](http://github.com/is/playgrounds/tree/master/android-rpi), 
 [`ffmpeg.108`](http://github.com/is/playgrounds/tree/master/ffmpeg), 
-[`crossbuild.105`](http://github.com/is/playgrounds/tree/master/crossbuild), 
-[`cxx-move.104`](http://github.com/is/playgrounds/tree/master/cxx-move),   
+[`crossbuild.105`](http://github.com/is/playgrounds/tree/master/crossbuild),   
+[`cxx-move.104`](http://github.com/is/playgrounds/tree/master/cxx-move), 
 [`geode.103`](http://github.com/is/playgrounds/tree/master/geode), 
 [`hazelcast.102`](http://github.com/is/playgrounds/tree/master/hazelcast), 
 [`ignite.101`](http://github.com/is/playgrounds/tree/master/ignite), 
