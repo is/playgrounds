@@ -1,0 +1,6 @@
+http://vcl.ucsd.edu/hed/hed_pretrained_bsds.caffemodel
+
+== https://github.com/ashukid/hed-edge-detector
+
+https://github.com/ashukid/hed-edge-detector/raw/master/hed_pretrained_bsds.caffemodel
+https://github.com/ashukid/hed-edge-detector/raw/master/deploy.prototxt
