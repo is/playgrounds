@@ -11,7 +11,7 @@ def main():
     # print(SC.star_source_img_ids())
     infns = glob.glob(IN_DIR + "/*")
     infns.sort()
-    # pathlib.Path(OUT_DIR).mkdir(parents=True, exist_ok=True)
+    pathlib.Path(OUT_DIR).mkdir(parents=True, exist_ok=True)
     for i in range(len(infns)):
         p1 = pathlib.Path(f'{OUT_DIR}/s_{i:02d}.ARW')
         if p1.is_symlink():
