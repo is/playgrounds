@@ -5,7 +5,7 @@
 
   - cv-1: opencv测试代码 - 2021.03
 
-  - opencv: opencv教程代码 - 2021.02
+  - cv-0: opencv教程代码 - 2021.02
   - arw2jpg: Sony ARW转jpg. - 2021.02
 
   - quant-0: quant sample code. - 2021.01
@@ -29,7 +29,7 @@
 
 # LINKS
 [`cv-1.115`](http://github.com/is/playgrounds/tree/master/cv-1), 
-[`opencv.115`](http://github.com/is/playgrounds/tree/master/opencv), 
+[`cv-0.115`](http://github.com/is/playgrounds/tree/master/cv-0), 
 [`arw2jpg.114`](http://github.com/is/playgrounds/tree/master/arw2jpg), 
 [`quant-0.113`](http://github.com/is/playgrounds/tree/master/quant-0), 
 [`mirrors.112`](http://github.com/is/playgrounds/tree/master/mirrors), 
