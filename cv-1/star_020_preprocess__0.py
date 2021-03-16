@@ -23,7 +23,7 @@ def process(img_id):
 
 
 def main():
-    ray.init()
+    ray.init(address='auto')
     img_ids = SC.star_source_img_ids()
     base_dir = pathlib.Path(SC.CACHE_DIR, "origin")
     base_dir.mkdir(exist_ok=True, parents=True)

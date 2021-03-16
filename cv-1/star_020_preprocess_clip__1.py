@@ -41,7 +41,7 @@ def convert(img_id:str) -> None:
 
 
 def main():
-    ray.init()
+    ray.init(address='auto')
     img_ids = SC.star_source_img_ids()
     future = [ convert.remote(img_id) for img_id in img_ids ]
     ray.get(future)

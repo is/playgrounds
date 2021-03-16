@@ -8,7 +8,7 @@ import cv2
 import ray
 
 
-import star_000_common as SC
+import star_common as SC
 
 def imsave(fn:Path, data) -> None:
     fn.parent.mkdir(parents=True, exist_ok=True)
@@ -39,7 +39,7 @@ def convert(img_id:str) -> None:
 
 
 def main():
-    ray.init()
+    ray.init(address='auto')
     img_ids = SC.star_source_img_ids()
     future = [ convert.remote(img_id) for img_id in img_ids ]
     ray.get(future)
