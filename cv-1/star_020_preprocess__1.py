@@ -1,9 +1,12 @@
 """
 准备灰度图以及图片金字塔.
+shiyo
 """
-import cv2
-import pathlib
 from pathlib import Path
+
+import cv2
+import ray
+
 
 import star_000_common as SC
 
@@ -11,6 +14,7 @@ def imsave(fn:Path, data) -> None:
     fn.parent.mkdir(parents=True, exist_ok=True)
     cv2.imwrite(str(fn), data)
 
+@ray.remote
 def convert(img_id:str) -> None:
     cache_dir = Path(SC.CACHE_DIR)
     indir = cache_dir / "origin"
@@ -35,10 +39,10 @@ def convert(img_id:str) -> None:
 
 
 def main():
+    ray.init()
     img_ids = SC.star_source_img_ids()
-    for img_id in img_ids:
-        print(img_id)
-        convert(img_id)
+    future = [ convert.remote(img_id) for img_id in img_ids ]
+    ray.get(future)
 
 
 if __name__ == '__main__':
