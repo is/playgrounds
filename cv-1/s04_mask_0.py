@@ -9,18 +9,16 @@ def main():
     gray = src
     
     gaussian = cv2.GaussianBlur(gray, (5, 5), 0)
-    cv2.imwrite("s/02__mask_blur_gaussian.png", gaussian)
+    cv2.imwrite("o/002/mask_blur_gaussian.png", gaussian)
     print(f"gaussian mean:{np.mean(gaussian)}, std:{np.std(gaussian)}")
 
     bilateral = cv2.bilateralFilter(src, 7, 42, 70)
-    cv2.imwrite("s/02__mask_bulr_bilateral.png", bilateral)
+    cv2.imwrite("o/002/mask_bulr_bilateral.png", bilateral)
     print(f"bilateral mean:{np.mean(bilateral)}, std:{np.std(bilateral)}")
 
     median = cv2.medianBlur(src,5)
-    cv2.imwrite("s/02__mask_blur_median.png", median)
+    cv2.imwrite("o/002/mask_blur_median.png", median)
     print(f"median mean:{np.mean(median)}, std:{np.std(median)}")
-
-
     gray = gaussian
 
     mean = np.mean(gray)
@@ -32,13 +30,10 @@ def main():
     mask2 = mask0 + mask1
     mask2 = cv2.medianBlur(mask2, 3)
 
-    cv2.imwrite("s/02__mask_src.png", src)
-    cv2.imwrite("s/02__mask_0.png", cv2.GaussianBlur(255 - mask0, (5, 5), 0))
-    cv2.imwrite("s/02__mask_1.png", mask1)
-    cv2.imwrite("s/02__mask_2.png", mask2)
-
-
-
+    cv2.imwrite("o/002/mask_src.png", src)
+    cv2.imwrite("o/002/mask_0.png", cv2.GaussianBlur(255 - mask0, (5, 5), 0))
+    cv2.imwrite("o/002/mask_1.png", mask1)
+    cv2.imwrite("o/002/mask_2.png", mask2)
 
 if __name__ == '__main__':
     main()
