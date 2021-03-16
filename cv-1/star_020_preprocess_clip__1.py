@@ -21,7 +21,7 @@ def convert(img_id:str) -> None:
 
     img = cv2.imread(str(indir / f"{img_id}.png"))
     img = img[0:3000, 0:4000, :]
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     fn = f"{img_id}.png"
     imsave(cache_dir / "x1" / fn, img)
     imsave(cache_dir / "gray" / fn, gray)

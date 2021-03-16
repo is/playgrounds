@@ -1,7 +1,6 @@
 """
 准备灰度图以及图片金字塔.
 """
-import rawpy
 import cv2
 import pathlib
 from pathlib import Path
