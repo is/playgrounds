@@ -7,9 +7,9 @@ import cv2
 
 
 __all__ = [
-    "img_id"
-    "imsave"
-]
+    "img_id",
+    "imsave",
+    "mkdir"]
 
 RAW_DIR = 'S0'
 SOURCE_DIR = 'star'
@@ -26,5 +26,8 @@ def star_source_img_ids() -> List[str]:
     return [ img_id(x) for x in imgs]
 
 
-def imsave(base:Path, name:str, img:Any, **kwargs) -> NoReturn:
+def imsave(base:Path, name:str, img:Any, **kwargs) -> None:
     cv2.imwrite(str(base / name), img, **kwargs)
+
+def mkdir(base:Path) -> None:
+    base.mkdir(parents=True, exist_ok=True)
