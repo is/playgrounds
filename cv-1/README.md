@@ -11,8 +11,16 @@ pip install opencv-contrib-python==4.5.1.48
 ```
 
 ## Rebuild opencv contrib with nonfree contribution
-MAKEFLAGS=-j16 CMAKE_ARGS="-DOPENCV_ENABLE_NONFREE=ON" \
+MAKEFLAGS=-j16 CMAKE_ARGS="-DOPENCV_ENABLE_NONFREE=ON -DBUILD_opencv_gapi=OFF" \
 pip install --no-binary=opencv-contrib-python opencv-contrib-python
+
+
+MAKEFLAGS=-j4 \
+CMAKE_ARGS="-DOPENCV_ENABLE_NONFREE=ON" \
+pip install --no-binary=opencv-contrib-python opencv-contrib-python
+
+
+
 
 ##
 
