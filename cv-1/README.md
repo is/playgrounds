@@ -19,6 +19,21 @@ MAKEFLAGS=-j4 \
 CMAKE_ARGS="-DOPENCV_ENABLE_NONFREE=ON" \
 pip install --no-binary=opencv-contrib-python opencv-contrib-python
 
+## Build opencv on Yard1
+cmake -DENABLE_OPENCV_NONFREE=ON \
+-DBUILD_NEW_PYTHON_SUPPORT=ON \
+-DBUILD_opencv_python3=ON \
+-DHAVE_opencv_python3=ON \
+-DPYTHON3_INCLUDE_DIR=$HOME/.is/conda/envs/sony/include \
+-DPYTHON3_LIBRARY=$HOME/.is/conda/envs/sony/lib/libpython3.so \
+-DPYTHON3_EXECUTABLE=$HOME/.is/conda/envs/sony/bin/python \
+-DPYTHON3_NUMPY_INCLUDE_DIRS=/home/admin/.is/conda/envs/sony/lib/python3.7/site-packages/numpy/core/include \
+..
+
+
+cmake -DENABLE_OPENCV_NONFREE=ON \
+-DBUILD_NEW_PYTHON_SUPPORT=ON \
+..
 
 
 
