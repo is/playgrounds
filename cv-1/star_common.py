@@ -9,6 +9,7 @@ import cv2
 __all__ = [
     "img_id",
     "imsave",
+    "star_source_img_ids",
     "mkdir"]
 
 RAW_DIR = 'S0'

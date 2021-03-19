@@ -1,12 +1,13 @@
 """
 https://www.pyimagesearch.com/2016/10/31/detecting-multiple-bright-spots-in-an-image-with-python-and-opencv/
 """
+import json
 from pathlib import Path
-from imutils import contours
-from skimage import measure
 import argparse
+
 import numpy as np
 import cv2
+
 
 S0 = 'star-cache/x1/s_00.png'
 # construct the argument parse and parse the arguments
@@ -46,6 +47,17 @@ def main():
     cimg = cv2.drawContours(mask.copy(), contours, 3, (0,255,0), 3)
     imsave(OUT_DIR, "040_contour.png", cimg)
 
+    ds = []
+    for contour in contours:
+        ci = {}
+        m = cv2.moments(contour)
+        ci['M'] = m
+        ci['area'] = cv2.contourArea(contour)
+        ci['cx'] = m['m10'] / m['m00']
+        ci['cy'] = m['m01'] / m['m00']
+        ci['diameter'] = np.sqrt(4*ci['area']/np.pi)
+        ds.append(ci)
+    print(json.dumps(ds, indent=True))
 
 
 if __name__ == '__main__':
