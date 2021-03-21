@@ -16,6 +16,7 @@ class Matcher(object):
         self.off = 0
         self.max_range = max_range
         self.cur = None
+        self.pairs = []
 
 
     def tag(self, tag):
@@ -48,6 +49,7 @@ class Matcher(object):
         dist = math.sqrt(min_dist)
         print(f"""{sign} / {pi['id']}/{pi['src']} / {p['img']}.{p['serial']}: ({pi['cx']:.2f},{pi['cy']:.2f}) / ({p['cx']:.2f},{p['cy']:.2f}) - dst:{dist:.2f}""")
         if min_dist < max_range:
+            self.pairs.append([pi['cx'], pi['cy'], p['cx'], p['cy']])
             pi['ps'].append(p)
             pi['tag'] = self.cur
             pi['cx'] = p['cx']
@@ -123,6 +125,10 @@ def main():
             cv2.FONT_HERSHEY_SIMPLEX,
             1, (255, 255, 255), 2, cv2.LINE_AA)
     cv2.imwrite('star-cache/050__trace.png', img)
+
+    with open('star-cache/050__pairs.json', 'w') as fout:
+        json.dump(matcher.pairs, fout, indent=True)
+    print(f"{len(matcher.pairs)} pairs")
 
 if __name__ == '__main__':
     main()

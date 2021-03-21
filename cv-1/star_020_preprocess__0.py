@@ -13,8 +13,8 @@ def process(img_id):
     print(f"process {img_id} ...")
     base_dir = pathlib.Path(SC.CACHE_DIR, "origin")
     with rawpy.imread(fn) as raw:
-        rgb = raw.postprocess(use_camera_wb=True)
-        #rgb = raw.postprocess(use_auto_wb=True)
+        #rgb = raw.postprocess(use_camera_wb=True)
+        rgb = raw.postprocess(use_auto_wb=True)
         fout = base_dir / f"{img_id}.png"
         bgr = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
         bgr = bgr[12:-12,12:-12,:]
