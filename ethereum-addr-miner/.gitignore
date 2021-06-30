@@ -1,0 +1,16 @@
+/.meta
+target
+*.iml
+*.iws
+*.ipr
+.idea
+
+__pycache__
+
+/o
+/data
+.ipynb_checkpoints/
+
+.classpath
+.project
+.settings
