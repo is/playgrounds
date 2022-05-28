@@ -1,15 +1,24 @@
 FROM alpine:3.16
 
 
+# sed -i -e 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories && \
+# -- install ossutil
 
 RUN \
  sed -i -e 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
-# sed -i -e 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories && \
+ # --
  apk update && apk upgrade && \
  apk add --update \
-  git curl python3 ffmpeg rclone rsync \
+  git curl python3 python3-dev ffmpeg rclone rsync \
   gcc g++ build-base libstdc++ py-pip cmake \
-  bash fish openssh 
+  fuse bash fish openssh aria2 && \
+ # --
+ curl -s -o /usr/bin/ossutil https://gosspublic.alicdn.com/ossutil/1.7.7/ossutil64 && \
+ chmod a+x /usr/bin/ossutil && \
+ echo "stage one"
+
+RUN --mount=type=bind,source=setup,target=/setup \
+ /setup/pip
 
 
 

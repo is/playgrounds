@@ -1,0 +1,6 @@
+#!/bin/sh
+
+docker buildx b \
+ -f dockerfile-ffmpeg \
+ --progress plain \
+ --tag ffmpeg:0.0.3 .
