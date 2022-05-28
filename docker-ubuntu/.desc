@@ -1,0 +1,6 @@
+---
+desc: dockerfile based ubuntu
+date: "2022.05"
+serial: 123
+tags: dockerfile,ubuntu
+id: docker-ubuntu

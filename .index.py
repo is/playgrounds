@@ -12,7 +12,7 @@ warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
 
 def list_projects():
   dirs = [ d for d in glob.glob("*") if os.path.isdir(d)]
-  for i in ['2019']:
+  for i in ['2019', '2020', '2021', '2021' ]:
     dirs.extend([d for d in glob.glob("%s/*" % i)
       if os.path.isdir(d)])
   return dirs
