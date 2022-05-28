@@ -1,0 +1,17 @@
+FROM alpine:3.16
+
+
+
+RUN \
+ sed -i -e 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+# sed -i -e 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories && \
+ apk update && apk upgrade && \
+ apk add --update \
+  git curl python3 ffmpeg rclone rsync \
+  gcc g++ build-base libstdc++ py-pip cmake \
+  bash fish openssh 
+
+
+
+
+
