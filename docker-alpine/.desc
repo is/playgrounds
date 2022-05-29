@@ -1,6 +1,0 @@
----
-desc: docker images based on alpine
-date: "2022.05"
-serial: 124
-tags: docker,image,alpine
-id: docker-alpine

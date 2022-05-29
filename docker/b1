@@ -1,0 +1,6 @@
+#!/bin/sh
+
+docker buildx b \
+ -f ffmpeg-arch.dockerfile \
+ --progress auto \
+ --tag ffmpeg-arch:0.0.4 .

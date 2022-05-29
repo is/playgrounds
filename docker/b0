@@ -1,0 +1,6 @@
+#!/bin/sh
+
+docker buildx b \
+ -f ffmpeg-ubuntu.dockerfile \
+ --progress auto \
+ --tag ffmpeg-ubuntu:0.0.4 .

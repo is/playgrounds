@@ -1,5 +1,0 @@
-#!/bin/sh
-
-docker buildx b \
- -f dockerfile-ffmpeg \
- --tag ubuntu-ffmpeg:0.0.2 .

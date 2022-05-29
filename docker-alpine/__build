@@ -1,6 +1,0 @@
-#!/bin/sh
-
-docker buildx b \
- -f dockerfile-ffmpeg \
- --progress plain \
- --tag alpine-ffmpeg:0.0.3 .
