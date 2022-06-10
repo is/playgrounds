@@ -18,7 +18,7 @@ RUN \
   /etc/apt/sources.list && \
  apt-get update -y && apt-get upgrade -y && \
  apt-get install -y git curl python3 ffmpeg python3-pip vim \
-  s3fs rsync rclone && \
+  s3fs rsync rclone zip unzip && \
  #apt-get clean all && \
  #rm -rf /var/lib/apt/lists/*
  echo "package ok."
