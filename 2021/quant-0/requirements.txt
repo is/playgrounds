@@ -3,7 +3,7 @@ chardet==4.0.0
 idna==2.10
 lxml==4.6.5
 multitasking==0.0.9
-numpy==1.21.0
+numpy==1.22.0
 pandas==1.2.0
 pyhoofinance==0.2.3
 python-dateutil==2.8.1
