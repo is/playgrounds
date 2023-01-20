@@ -4,4 +4,4 @@ echo $0
 cd $(dirname $0)/../.git/hooks
 pwd
 #cd $HOME/src/playgrounds/.git/hooks
-ln -snf ../../_/git-hook/commit-msg-hook.py commit-msg
+ln -snf ../../git-hook/commit-msg-hook.py commit-msg
