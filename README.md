@@ -3,6 +3,8 @@
 ```
   ///// LIVE PROJECT /////
 
+  - rust-clap: rust clap sample - 2023.01
+
   - docker: docker image files - 2022.05
   - docker-arch: dockerfile based arch - 2022.05
 
@@ -35,21 +37,22 @@
 ```
 
 # LINKS
+[`rust-clap.126`](http://github.com/is/playgrounds/tree/master/rust-clap), 
 [`docker.125`](http://github.com/is/playgrounds/tree/master/docker), 
 [`docker-arch.122`](http://github.com/is/playgrounds/tree/master/docker-arch), 
 [`free-proxy.121`](http://github.com/is/playgrounds/tree/master/free-proxy), 
 [`ethereum-addr-miner.120`](http://github.com/is/playgrounds/tree/master/ethereum-addr-miner), 
-[`golang-1.119`](http://github.com/is/playgrounds/tree/master/golang-1), 
+[`golang-1.119`](http://github.com/is/playgrounds/tree/master/golang-1),   
 [`cv-1.115`](http://github.com/is/playgrounds/tree/master/cv-1), 
-[`cv-0.115`](http://github.com/is/playgrounds/tree/master/cv-0),   
+[`cv-0.115`](http://github.com/is/playgrounds/tree/master/cv-0), 
 [`arw2jpg.114`](http://github.com/is/playgrounds/tree/master/arw2jpg), 
 [`quant-0.113`](http://github.com/is/playgrounds/tree/master/2021/quant-0), 
 [`mirrors.112`](http://github.com/is/playgrounds/tree/master/mirrors), 
 [`github.111`](http://github.com/is/playgrounds/tree/master/github), 
 [`android-rpi.110`](http://github.com/is/playgrounds/tree/master/android-rpi), 
 [`ffmpeg.108`](http://github.com/is/playgrounds/tree/master/ffmpeg), 
-[`crossbuild.105`](http://github.com/is/playgrounds/tree/master/crossbuild),
-[`cxx-move.104`](http://github.com/is/playgrounds/tree/master/cxx-move),
+[`crossbuild.105`](http://github.com/is/playgrounds/tree/master/crossbuild),   
+[`cxx-move.104`](http://github.com/is/playgrounds/tree/master/cxx-move), 
 [`geode.103`](http://github.com/is/playgrounds/tree/master/geode), 
 [`hazelcast.102`](http://github.com/is/playgrounds/tree/master/2021/hazelcast), 
 [`ignite.101`](http://github.com/is/playgrounds/tree/master/ignite), 
