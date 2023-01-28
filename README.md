@@ -12,9 +12,9 @@
   - ethereum-addr-miner: __ - 2021.06
   - golang-1: Sample code in golang. - 2021.06
 
-  - cv-1: opencv测试代码 - 2021.03
+  - 2021/cv-1: opencv测试代码 - 2021.03
 
-  - cv-0: opencv教程代码 - 2021.02
+  - 2021/cv-0: opencv教程代码 - 2021.02
   - arw2jpg: Sony ARW转jpg. - 2021.02
 
   - 2021/quant-0: quant sample code. - 2021.01
@@ -43,8 +43,8 @@
 [`free-proxy.121`](http://github.com/is/playgrounds/tree/master/free-proxy), 
 [`ethereum-addr-miner.120`](http://github.com/is/playgrounds/tree/master/ethereum-addr-miner), 
 [`golang-1.119`](http://github.com/is/playgrounds/tree/master/golang-1),   
-[`cv-1.115`](http://github.com/is/playgrounds/tree/master/cv-1), 
-[`cv-0.115`](http://github.com/is/playgrounds/tree/master/cv-0), 
+[`cv-1.115`](http://github.com/is/playgrounds/tree/master/2021/cv-1), 
+[`cv-0.115`](http://github.com/is/playgrounds/tree/master/2021/cv-0), 
 [`arw2jpg.114`](http://github.com/is/playgrounds/tree/master/arw2jpg), 
 [`quant-0.113`](http://github.com/is/playgrounds/tree/master/2021/quant-0), 
 [`mirrors.112`](http://github.com/is/playgrounds/tree/master/mirrors), 
