@@ -3,12 +3,15 @@ import sys
 import glob
 import operator
 import time
-
-import ruamel_yaml as yaml
 import pprint
-
 import warnings
-warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
+
+try:
+  import ruamel_yaml as yaml
+  warnings.simplefilter('ignore', yaml.error.UnsafeLoaderWarning)
+except:
+  import yaml
+
 
 def list_projects():
   dirs = [ d for d in glob.glob("*") if os.path.isdir(d)]
