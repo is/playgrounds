@@ -12,7 +12,7 @@
 	<description>Message Pack Servlet handler</description>
 
 	<properties>
-		<jettyVersion>10.0.10</jettyVersion>
+		<jettyVersion>10.0.14</jettyVersion>
 	</properties>
 
 	<dependencies>
